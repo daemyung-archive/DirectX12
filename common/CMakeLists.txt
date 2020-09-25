@@ -6,7 +6,8 @@
 find_package(fmt CONFIG REQUIRED)
 
 add_library(common
-    STATIC include/common/utility.h
+    STATIC include/common/d3dx12.h
+           include/common/utility.h
            include/common/window.h
            include/common/example.h
                src/window.cpp
