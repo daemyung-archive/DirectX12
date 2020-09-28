@@ -10,8 +10,11 @@ add_library(common
            include/common/utility.h
            include/common/window.h
            include/common/example.h
+           include/common/uploader.h
+               src/utility.cpp
                src/window.cpp
-               src/example.cpp)
+               src/example.cpp
+               src/uploader.cpp)
 
 target_include_directories(common
     PUBLIC  include
@@ -26,7 +29,8 @@ target_compile_definitions(common
            WIN32_LEAN_AND_MEAN)
 
 target_link_libraries(common
-    PUBLIC dxgi.lib
+    PUBLIC dxguid.lib
+           dxgi.lib
            d3dcompiler.lib
            d3d12.lib
            fmt::fmt)

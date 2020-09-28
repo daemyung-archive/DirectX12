@@ -129,10 +129,10 @@ protected:
     Resolution _resolution = kFHDResolution;
     ComPtr<IDXGIFactory7> _factory;
     ComPtr<IDXGIAdapter4> _adapter;
-    ComPtr<ID3D12Device6> _device;
+    ComPtr<ID3D12Device4> _device;
     ComPtr<ID3D12CommandQueue> _command_queue;
     FrameResource<ID3D12CommandAllocator> _command_allocators;
-    FrameResource<ID3D12GraphicsCommandList6> _command_lists;
+    FrameResource<ID3D12GraphicsCommandList4> _command_lists;
     ComPtr<ID3D12Fence> _fence;
     UINT64 _fence_value = 0;
     UINT64 _fence_value_stamps[kSwapChainBufferCount] = {};
