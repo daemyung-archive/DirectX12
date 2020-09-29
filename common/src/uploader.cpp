@@ -70,7 +70,7 @@ void Uploader::Execute() {
     // Execute copy commands.
     _command_queues[0]->ExecuteCommandLists(1, &command_lists[0]);
 
-    // Make a dependency between a copy queue and a direct qeueue.
+    // Make a dependency between a copy queue and a direct queue.
     _command_queues[0]->Signal(_fence.Get(), 1);
     _command_queues[1]->Wait(_fence.Get(), 1);
 
