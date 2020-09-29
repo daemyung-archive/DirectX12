@@ -96,11 +96,11 @@ protected:
     /// Initialize a command queue.
     void InitCommandQueue();
 
-    /// Initialize a command allocator.
+    /// Initialize command allocators.
     void InitCommandAllocators();
 
     /// Initialize a command list.
-    void InitCommandLists();
+    void InitCommandList();
 
     /// Initialize a fence.
     void InitFence();
@@ -112,8 +112,8 @@ protected:
     void TermEvent();
 
     /// Initialize descriptor heap.
-    /// \param descriptorCount The number of descriptor in each heap.
-    void InitDescriptorHeaps(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &descriptorCount);
+    /// \param descriptor_counts The number of descriptor in each heap.
+    void InitDescriptorHeaps(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &descriptor_counts);
 
     /// Initialize descriptor heap size.
     void InitDescriptorHeapSizes();
@@ -132,7 +132,7 @@ protected:
     ComPtr<ID3D12Device4> _device;
     ComPtr<ID3D12CommandQueue> _command_queue;
     FrameResource<ID3D12CommandAllocator> _command_allocators;
-    FrameResource<ID3D12GraphicsCommandList4> _command_lists;
+    ComPtr<ID3D12GraphicsCommandList4> _command_list;
     ComPtr<ID3D12Fence> _fence;
     UINT64 _fence_value = 0;
     UINT64 _fence_value_stamps[kSwapChainBufferCount] = {};

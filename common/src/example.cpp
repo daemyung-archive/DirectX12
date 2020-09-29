@@ -14,7 +14,7 @@ Example::Example(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &des
     InitAdapter();
     InitDevice();
     InitCommandQueue();
-    InitCommandLists();
+    InitCommandList();
     InitCommandAllocators();
     InitFence();
     InitEvent();
@@ -40,14 +40,6 @@ void Example::BindToWindow(Window *window) {
 void Example::Init() {
     // Build descriptors.
     OnBuildDescriptors();
-
-    // Build command lists.
-    for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-        ThrowIfFailed(_command_allocators[i]->Reset());
-        ThrowIfFailed(_command_lists[i]->Reset(_command_allocators[i].Get(), nullptr));
-        OnBuildCommands(i);
-        ThrowIfFailed(_command_lists[i]->Close());
-    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,8 +64,14 @@ void Example::Render() {
     // Update uniforms.
     OnUpdateUniforms(_swap_chain->GetCurrentBackBufferIndex());
 
+    // Record commands.
+    ThrowIfFailed(_command_allocators[index]->Reset());
+    ThrowIfFailed(_command_list->Reset(_command_allocators[index].Get(), nullptr));
+    OnBuildCommands(index);
+    ThrowIfFailed(_command_list->Close());
+
     // Execute a command list.
-    std::vector<ID3D12CommandList *> command_lists = {_command_lists[index].Get()};
+    std::vector<ID3D12CommandList *> command_lists = {_command_list.Get()};
     _command_queue->ExecuteCommandLists(static_cast<UINT>(command_lists.size()), command_lists.data());
     ThrowIfFailed(_command_queue->Signal(_fence.Get(), ++_fence_value));
     _fence_value_stamps[index] = _fence_value;
@@ -143,11 +141,9 @@ void Example::InitCommandAllocators() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Example::InitCommandLists() {
-    for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-        ThrowIfFailed(_device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE,
-                                                  IID_PPV_ARGS(&_command_lists[i])));
-    }
+void Example::InitCommandList() {
+    ThrowIfFailed(_device->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE,
+                                              IID_PPV_ARGS(&_command_list)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -178,8 +174,8 @@ void Example::TermEvent() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Example::InitDescriptorHeaps(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &descriptorCount) {
-    for (auto[type, count] : descriptorCount) {
+void Example::InitDescriptorHeaps(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &descriptor_counts) {
+    for (auto[type, count] : descriptor_counts) {
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
         desc.Type = type;
         desc.NumDescriptors = count;

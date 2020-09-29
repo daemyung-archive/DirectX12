@@ -77,7 +77,7 @@ protected:
                                                                 D3D12_RESOURCE_STATE_RENDER_TARGET);
 
         // Record a resource transition command.
-        _command_lists[index]->ResourceBarrier(1, &resource_barrier);
+        _command_list->ResourceBarrier(1, &resource_barrier);
 
         // Define a clear color.
         clear_color[0] = 0.0f;
@@ -86,30 +86,30 @@ protected:
         clear_color[3] = 1.0f;
 
         // Record clearing render target view command.
-        _command_lists[index]->ClearRenderTargetView(swap_chain_views[index], clear_color, 0, nullptr);
+        _command_list->ClearRenderTargetView(swap_chain_views[index], clear_color, 0, nullptr);
 
         // Define a viewport.
         viewport.Width = static_cast<float>(GetWidth(_resolution));
         viewport.Height = static_cast<float>(GetHeight(_resolution));
 
         // Record to set a viewport.
-        _command_lists[index]->RSSetViewports(1, &viewport);
+        _command_list->RSSetViewports(1, &viewport);
 
         // Define a scissor rect.
         scissor_rect.right = GetWidth(_resolution);
         scissor_rect.bottom = GetHeight(_resolution);
 
         // Record to set a scissor rect
-        _command_lists[index]->RSSetScissorRects(1, &scissor_rect);
+        _command_list->RSSetScissorRects(1, &scissor_rect);
 
         // Record commands to draw a triangle.
-        _command_lists[index]->OMSetRenderTargets(1, &swap_chain_views[index], true, nullptr);
-        _command_lists[index]->SetGraphicsRootSignature(_root_signature.Get());
-        _command_lists[index]->SetPipelineState(_pipeline_state.Get());
-        _command_lists[index]->IASetVertexBuffers(0, 1, &_vertex_buffer_view);
-        _command_lists[index]->IASetIndexBuffer(&_index_buffer_view);
-        _command_lists[index]->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        _command_lists[index]->DrawIndexedInstanced(3, 1, 0, 0, 0);
+        _command_list->OMSetRenderTargets(1, &swap_chain_views[index], true, nullptr);
+        _command_list->SetGraphicsRootSignature(_root_signature.Get());
+        _command_list->SetPipelineState(_pipeline_state.Get());
+        _command_list->IASetVertexBuffers(0, 1, &_vertex_buffer_view);
+        _command_list->IASetIndexBuffer(&_index_buffer_view);
+        _command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        _command_list->DrawIndexedInstanced(3, 1, 0, 0, 0);
 
         // Define a transition of a resource from RENDER_TARGET to PRESENT.
         resource_barrier = CD3DX12_RESOURCE_BARRIER::Transition(_swap_chain_buffers[index].Get(),
@@ -117,7 +117,7 @@ protected:
                                                                 D3D12_RESOURCE_STATE_PRESENT);
 
         // Record a resource transition command.
-        _command_lists[index]->ResourceBarrier(1, &resource_barrier);
+        _command_list->ResourceBarrier(1, &resource_barrier);
     }
 
     void OnUpdateUniforms(UINT index) override {
