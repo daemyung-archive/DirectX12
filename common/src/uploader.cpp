@@ -5,10 +5,10 @@
 
 #include "uploader.h"
 
+#include <d3dx12.h>
 #include <dxgi1_6.h>
 #include <array>
 
-#include "d3dx12.h"
 #include "utility.h"
 
 #pragma clang diagnostic push

@@ -5,10 +5,9 @@
 
 #include "utility.h"
 
+#include <d3dx12.h>
 #include <d3dcompiler.h>
 #include <iostream>
-
-#include "d3dx12.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Waddress-of-temporary"
