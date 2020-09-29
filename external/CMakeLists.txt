@@ -9,6 +9,9 @@ add_library(external
            include/imgui.h
            include/imgui_impl_dx12.h
            include/imgui_impl_win32.h
+           include/fmt/core.h
+           include/fmt/format.h
+           include/fmt/format-inl.h
                src/imgui_internal.h
                src/imstb_truetype.h
                src/imstb_textedit.h
@@ -18,7 +21,8 @@ add_library(external
                src/imgui_widgets.cpp
                src/imgui_demo.cpp
                src/imgui_impl_dx12.cpp
-               src/imgui_impl_win32.cpp)
+               src/imgui_impl_win32.cpp
+               src/format.cc)
 
 target_include_directories(external
     PUBLIC include)

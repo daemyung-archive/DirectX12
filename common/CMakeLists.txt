@@ -3,8 +3,6 @@
 # See "LICENSE" for license information.
 #
 
-find_package(fmt CONFIG REQUIRED)
-
 add_library(common
     STATIC include/common/utility.h
            include/common/window.h
@@ -32,5 +30,4 @@ target_link_libraries(common
            dxguid.lib
            dxgi.lib
            d3dcompiler.lib
-           d3d12.lib
-           fmt::fmt)
+           d3d12.lib)
