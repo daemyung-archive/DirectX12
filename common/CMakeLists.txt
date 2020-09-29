@@ -29,7 +29,8 @@ target_compile_definitions(common
            WIN32_LEAN_AND_MEAN)
 
 target_link_libraries(common
-    PUBLIC dxguid.lib
+    PUBLIC external
+           dxguid.lib
            dxgi.lib
            d3dcompiler.lib
            d3d12.lib

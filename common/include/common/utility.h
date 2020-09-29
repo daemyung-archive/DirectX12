@@ -19,26 +19,33 @@ using Resolution = std::tuple<UINT, UINT>;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-/// Retrieve a width from a resolution.
-/// \param resolution A resolution.
-/// \return A width.
+//! Retrieve a width from a resolution.
+//! \param resolution A resolution.
+//! \return A width.
 inline auto GetWidth(const Resolution &resolution) {
     return std::get<0>(resolution);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-/// Retrieve a height from a resolution.
-/// \param resolution A resolution.
-/// \return A height.
+//! Retrieve a height from a resolution.
+//! \param resolution A resolution.
+//! \return A height.
 inline auto GetHeight(const Resolution &resolution) {
     return std::get<1>(resolution);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-/// Throw an exception if a function returns an error.
-/// \param function A function call.
+//! Convert from UTF16 to UTF8.
+//! \param utf16 A UTF16 string.
+//! \return A UTF8 string.
+std::string ConvertUTF16ToUTF8(wchar_t *utf16);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Throw an exception if a function returns an error.
+//! \param function A function call.
 #define ThrowIfFailed(function) {                                                              \
     HRESULT result = function;                                                                 \
     if (FAILED(result)) {                                                                      \

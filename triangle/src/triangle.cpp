@@ -27,7 +27,8 @@ struct Options {
 //----------------------------------------------------------------------------------------------------------------------
 
 const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> kDescriptorCount = {
-        {D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kSwapChainBufferCount}};
+        {D3D12_DESCRIPTOR_HEAP_TYPE_RTV,         kSwapChainBufferCount},
+        {D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kImGuiFontBufferCount}};
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ inline auto BuildFilePath(const std::string &file_name) {
 
 class Triangle : public Example {
 public:
-    Triangle() : Example(kDescriptorCount) {
+    Triangle() : Example("Triangle", kDescriptorCount) {
         InitResources();
         InitPipelines();
     }
@@ -62,6 +63,18 @@ protected:
             _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, rtv);
             swap_chain_views[i] = rtv;
             rtv.Offset(_descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]);
+        }
+    }
+
+    void OnUpdateUniforms(UINT index) override {
+    }
+
+    void OnUpdateImGui() override {
+        if (ImGui::CollapsingHeader("Options", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::Checkbox("Use staging buffer", &_options.use_staging_buffer)) {
+                WaitCommandQueueIdle();
+                InitResources();
+            }
         }
     }
 
@@ -111,6 +124,8 @@ protected:
         _command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         _command_list->DrawIndexedInstanced(3, 1, 0, 0, 0);
 
+        RecordDrawImGuiCommands();
+
         // Define a transition of a resource from RENDER_TARGET to PRESENT.
         resource_barrier = CD3DX12_RESOURCE_BARRIER::Transition(_swap_chain_buffers[index].Get(),
                                                                 D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -118,9 +133,6 @@ protected:
 
         // Record a resource transition command.
         _command_list->ResourceBarrier(1, &resource_barrier);
-    }
-
-    void OnUpdateUniforms(UINT index) override {
     }
 
 private:

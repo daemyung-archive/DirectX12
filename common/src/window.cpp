@@ -5,17 +5,21 @@
 
 #include "window.h"
 
+#include <imgui_impl_win32.h>
 #include <combaseapi.h>
 #include <stdexcept>
 #include <array>
 #include <tuple>
-#include <memory>
 
 #include "example.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 constexpr size_t kUniqueNameLength = 39;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -64,6 +68,10 @@ std::tuple<UINT, UINT> GetWindowSize(const Resolution &resolution) {
 /// \param lParam Additional message information. It depends on the value of the uMsg parameter.
 /// \return The result of the message processing and depends on the message sent.
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
+        return 1;
+    }
+
     switch (uMsg) {
         case WM_CREATE: {
             auto data = reinterpret_cast<LPCREATESTRUCT>(lParam)->lpCreateParams;

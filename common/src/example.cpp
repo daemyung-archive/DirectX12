@@ -5,11 +5,16 @@
 
 #include "example.h"
 
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx12.h>
+
 #include "window.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
-Example::Example(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &descriptor_counts) {
+Example::Example(const std::string &title,
+                 const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &descriptor_counts) :
+        _title(title) {
     InitFactory();
     InitAdapter();
     InitDevice();
@@ -25,6 +30,7 @@ Example::Example(const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> &des
 //----------------------------------------------------------------------------------------------------------------------
 
 Example::~Example() {
+    TermImGui();
     TermEvent();
 }
 
@@ -33,6 +39,7 @@ Example::~Example() {
 void Example::BindToWindow(Window *window) {
     InitSwapChain(window);
     InitSwapChainBuffers();
+    InitImGui(window);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,6 +68,11 @@ void Example::Render() {
         WaitForSingleObject(_event, INFINITE);
     }
 
+    // Update ImGui.
+    BeginImGuiPass();
+    OnUpdateImGui();
+    EndImGuiPass();
+
     // Update uniforms.
     OnUpdateUniforms(_swap_chain->GetCurrentBackBufferIndex());
 
@@ -78,6 +90,15 @@ void Example::Render() {
 
     // Preset a swap chain image.
     ThrowIfFailed(_swap_chain->Present(0, 0));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::RecordDrawImGuiCommands() {
+    std::vector<ID3D12DescriptorHeap *> descriptor_heaps = {
+            _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Get()};
+    _command_list->SetDescriptorHeaps(static_cast<UINT>(descriptor_heaps.size()), descriptor_heaps.data());
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), _command_list.Get());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,6 +133,7 @@ void Example::InitFactory() {
 void Example::InitAdapter() {
     ThrowIfFailed(_factory->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
                                                        IID_PPV_ARGS(&_adapter)));
+    ThrowIfFailed(_adapter->GetDesc3(&_adapter_desc));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -224,6 +246,63 @@ void Example::InitSwapChainBuffers() {
     for (auto i = 0; i != kSwapChainBufferCount; ++i) {
         ThrowIfFailed(_swap_chain->GetBuffer(i, IID_PPV_ARGS(&_swap_chain_buffers[i])));
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::InitImGui(Window *window) {
+    // Initialize ImGUI.
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    // Use the classic theme.
+    ImGui::StyleColorsClassic();
+
+    // Initialize ImGUI for Windows.
+    ImGui_ImplWin32_Init(window->GetWindow());
+
+    // Retrieve resource which are need to set up ImGUI.
+    auto descriptor_heap = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Get();
+    auto offset = descriptor_heap->GetDesc().NumDescriptors - kImGuiFontBufferCount;
+    auto size = _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV];
+    CD3DX12_CPU_DESCRIPTOR_HANDLE cpu_handle(descriptor_heap->GetCPUDescriptorHandleForHeapStart());
+    cpu_handle.Offset(offset, size);
+    CD3DX12_GPU_DESCRIPTOR_HANDLE gpu_handle(descriptor_heap->GetGPUDescriptorHandleForHeapStart());
+    cpu_handle.Offset(offset, size);
+
+    // Initialize ImGUI for DirectX12.
+    ImGui_ImplDX12_Init(_device.Get(), kSwapChainBufferCount, kSwapChainFormat, descriptor_heap,
+                        cpu_handle, gpu_handle);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::TermImGui() {
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::BeginImGuiPass() {
+    ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+    ImGui::Begin("DirectX12", nullptr,
+                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+    ImGui::TextUnformatted(_title.c_str());
+    ImGui::TextUnformatted(ConvertUTF16ToUTF8(_adapter_desc.Description).c_str());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::EndImGuiPass() {
+    ImGui::End();
+    ImGui::PopStyleVar();
+    ImGui::EndFrame();
+    ImGui::Render();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -11,13 +11,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> kDescriptorCount = {
-        {D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kSwapChainBufferCount}};
+        {D3D12_DESCRIPTOR_HEAP_TYPE_RTV,         kSwapChainBufferCount},
+        {D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kImGuiFontBufferCount}};
 
 //----------------------------------------------------------------------------------------------------------------------
 
 class Template : public Example {
 public:
-    Template() : Example(kDescriptorCount) {
+    Template() : Example("Template", kDescriptorCount) {
     }
 
 protected:
@@ -29,6 +30,12 @@ protected:
             _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, handle);
             handle.ptr += _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
         }
+    }
+
+    void OnUpdateUniforms(UINT index) override {
+    }
+
+    virtual void OnUpdateImGui() {
     }
 
     void OnBuildCommands(UINT index) override {
@@ -61,13 +68,12 @@ protected:
         _command_list->ClearRenderTargetView(handle, DirectX::Colors::LightSteelBlue, 0, nullptr);
         _command_list->OMSetRenderTargets(1, &handle, true, nullptr);
 
+        RecordDrawImGuiCommands();
+
         barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
         barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 
         _command_list->ResourceBarrier(1, &barrier);
-    }
-
-    void OnUpdateUniforms(UINT index) override {
     }
 };
 

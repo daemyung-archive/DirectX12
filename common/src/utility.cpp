@@ -19,6 +19,15 @@ using Microsoft::WRL::ComPtr;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string ConvertUTF16ToUTF8(wchar_t *utf16) {
+    auto size = WideCharToMultiByte(CP_ACP, 0, utf16, -1, nullptr, 0, nullptr, nullptr);
+    std::string utf8(size, ' ');
+    WideCharToMultiByte(CP_ACP, 0, utf16, -1, utf8.data(), size, nullptr, nullptr);
+    return utf8;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 size,
                             D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
     return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
