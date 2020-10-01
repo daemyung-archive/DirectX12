@@ -31,7 +31,6 @@ class Window;
 
 constexpr auto kSwapChainBufferCount = 2;
 constexpr auto kSwapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-constexpr auto kFHDResolution = Resolution(1280, 720);
 constexpr auto kImGuiFontBufferCount = 1;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,13 +70,6 @@ public:
 
     //! Render.
     void Render();
-
-    //! Retrieve a resolution.
-    //! \return A resolution.
-    [[nodiscard]]
-    inline auto GetResolution() const {
-        return _resolution;
-    }
 
 protected:
     //! Record draw commands for ImGui.
@@ -160,7 +152,6 @@ protected:
     void EndImGuiPass();
 
 protected:
-    Resolution _resolution = kFHDResolution;
     std::string _title;
     ComPtr<IDXGIFactory7> _factory;
     ComPtr<IDXGIAdapter4> _adapter;

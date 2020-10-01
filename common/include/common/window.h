@@ -10,6 +10,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+constexpr auto kFHDResolution = Resolution(1280, 720);
+
+//----------------------------------------------------------------------------------------------------------------------
+
 class Example;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -25,6 +29,10 @@ public:
     /// Start the main loop.
     /// \param example An example will be shown on a window.
     void MainLoop(Example *example);
+
+    //! Retrieve a window resolution.
+    //! \return A resolution of window.
+    Resolution GetResolution() const;
 
     /// Retrieve a instance handle.
     /// \return A instance handle.
@@ -51,9 +59,7 @@ private:
     void TermAtom();
 
     /// Initialize a window handle.
-    /// \param resolution A resolution of window.
-    /// \param userData A user data.
-    void InitWindow(const Resolution &resolution, void *userData);
+    void InitWindow(const Resolution &resolution);
 
     /// Terminate a window handle.
     void TermWindow();

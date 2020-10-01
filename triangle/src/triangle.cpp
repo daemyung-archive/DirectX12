@@ -54,22 +54,20 @@ public:
 
 protected:
     void OnInit() override {
-        // Set the first CPU descriptor handle of RTV heap.
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
-                _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart());
-
-        // Initialize swap chain views.
-        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-            _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, rtv);
-            swap_chain_views[i] = rtv;
-            rtv.Offset(_descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]);
-        }
     }
 
     void OnTerm() override {
     }
 
     void OnResize(const Resolution& resolution) override {
+        // Update a viewport.
+        _viewport.Width = static_cast<float>(GetWidth(resolution));
+        _viewport.Height = static_cast<float>(GetHeight(resolution));
+
+        // Update a scissor rect.
+        _scissor_rect.right = GetWidth(resolution);
+        _scissor_rect.bottom = GetHeight(resolution);
+
         // Set the first CPU descriptor handle of RTV heap.
         CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
                 _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart());
@@ -114,22 +112,10 @@ protected:
         // Record clearing render target view command.
         _command_list->ClearRenderTargetView(swap_chain_views[index], clear_color, 0, nullptr);
 
-        // Define a viewport.
-        viewport.Width = static_cast<float>(GetWidth(_resolution));
-        viewport.Height = static_cast<float>(GetHeight(_resolution));
-
-        // Record to set a viewport.
-        _command_list->RSSetViewports(1, &viewport);
-
-        // Define a scissor rect.
-        scissor_rect.right = GetWidth(_resolution);
-        scissor_rect.bottom = GetHeight(_resolution);
-
-        // Record to set a scissor rect
-        _command_list->RSSetScissorRects(1, &scissor_rect);
-
         // Record commands to draw a triangle.
         _command_list->OMSetRenderTargets(1, &swap_chain_views[index], true, nullptr);
+        _command_list->RSSetViewports(1, &_viewport);
+        _command_list->RSSetScissorRects(1, &_scissor_rect);
         _command_list->SetGraphicsRootSignature(_root_signature.Get());
         _command_list->SetPipelineState(_pipeline_state.Get());
         _command_list->IASetVertexBuffers(0, 1, &_vertex_buffer_view);
@@ -239,6 +225,8 @@ private:
     D3D12_INDEX_BUFFER_VIEW _index_buffer_view = {};
     ComPtr<ID3D12RootSignature> _root_signature;
     ComPtr<ID3D12PipelineState> _pipeline_state;
+    D3D12_VIEWPORT _viewport = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    D3D12_RECT _scissor_rect = {0, 0, 0, 0};
     D3D12_CPU_DESCRIPTOR_HANDLE swap_chain_views[kSwapChainBufferCount] = {};
 };
 

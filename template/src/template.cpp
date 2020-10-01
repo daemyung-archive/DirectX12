@@ -23,19 +23,20 @@ public:
 
 protected:
     void OnInit() override {
-        D3D12_CPU_DESCRIPTOR_HANDLE handle;
-
-        handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
-        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-            _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, handle);
-            handle.ptr += _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
-        }
     }
 
     void OnTerm() override {
     }
 
     void OnResize(const Resolution& resolution) override {
+        // Update a viewport.
+        _viewport.Width = static_cast<float>(GetWidth(resolution));
+        _viewport.Height = static_cast<float>(GetHeight(resolution));
+
+        // Update a scissor rect.
+        _scissor_rect.right = GetWidth(resolution);
+        _scissor_rect.bottom = GetHeight(resolution);
+
         D3D12_CPU_DESCRIPTOR_HANDLE handle;
 
         handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
@@ -58,18 +59,6 @@ protected:
 
         _command_list->ResourceBarrier(1, &barrier);
 
-        D3D12_VIEWPORT viewport = {};
-        viewport.Width = static_cast<float>(GetWidth(_resolution));
-        viewport.Height = static_cast<float>(GetHeight(_resolution));
-        viewport.MaxDepth = 1.0f;
-
-        _command_list->RSSetViewports(1, &viewport);
-
-        D3D12_RECT scissor = {};
-        scissor.right = GetWidth(_resolution);
-        scissor.bottom = GetHeight(_resolution);
-        _command_list->RSSetScissorRects(1, &scissor);
-
         D3D12_CPU_DESCRIPTOR_HANDLE handle;
 
         handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
@@ -77,6 +66,8 @@ protected:
 
         _command_list->ClearRenderTargetView(handle, DirectX::Colors::LightSteelBlue, 0, nullptr);
         _command_list->OMSetRenderTargets(1, &handle, true, nullptr);
+        _command_list->RSSetViewports(1, &_viewport);
+        _command_list->RSSetScissorRects(1, &_scissor_rect);
 
         RecordDrawImGuiCommands();
 
@@ -85,6 +76,10 @@ protected:
 
         _command_list->ResourceBarrier(1, &barrier);
     }
+
+private:
+    D3D12_VIEWPORT _viewport = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    D3D12_RECT _scissor_rect = {0, 0, 0, 0};
 };
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -70,7 +70,6 @@ void Example::Resize(const Resolution &resolution) {
 
     // Resize by an example.
     OnResize(resolution);
-    _resolution = resolution;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -245,11 +244,13 @@ void Example::InitDescriptorHeapSizes() {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::InitSwapChain(Window *window) {
+    auto resolution = window->GetResolution();
+
     // Define a swap chain.
     DXGI_SWAP_CHAIN_DESC1 desc = {};
     desc.BufferCount = kSwapChainBufferCount;
-    desc.Width = GetWidth(_resolution);
-    desc.Height = GetHeight(_resolution);
+    desc.Width = GetWidth(resolution);
+    desc.Height = GetHeight(resolution);
     desc.Format = kSwapChainFormat;
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;

@@ -74,11 +74,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
     auto example = reinterpret_cast<Example *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     switch (uMsg) {
-        case WM_CREATE: {
-            auto data = reinterpret_cast<LPCREATESTRUCT>(lParam)->lpCreateParams;
-            SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(data));
-            return 0;
-        }
         case WM_CLOSE: {
             PostQuitMessage(0);
             return 0;
@@ -103,21 +98,24 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 Window::Window() {
     InitInstance();
     InitAtom();
+    InitWindow(kFHDResolution);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 Window::~Window() {
+    TermWindow();
     TermAtom();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void Window::MainLoop(Example *example) {
-    InitWindow(example->GetResolution(), example);
+    SetWindowLongPtr(_window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(example));
 
     example->BindToWindow(this);
     example->Init();
+    example->Resize(GetResolution());
 
     // Show and update a window.
     ShowWindow(_window, SW_SHOW);
@@ -131,7 +129,17 @@ void Window::MainLoop(Example *example) {
     }
 
     example->Term();
-    TermWindow();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Resolution Window::GetResolution() const {
+    RECT rect;
+    if (!GetClientRect(_window, &rect)) {
+        throw std::runtime_error("Fail to get window resolution.");
+    }
+
+    return {rect.right - rect.left, rect.bottom - rect.top};
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -174,13 +182,13 @@ void Window::TermAtom() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Window::InitWindow(const Resolution &resolution, void *userData) {
+void Window::InitWindow(const Resolution &resolution) {
     // Get a window size.
     auto size = GetWindowSize(resolution);
 
     // Create a window.
     _window = CreateWindow(MAKEINTATOM(_atom), L"DirectX12", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-                           std::get<0>(size), std::get<1>(size), nullptr, nullptr, _instance, userData);
+                           std::get<0>(size), std::get<1>(size), nullptr, nullptr, _instance, nullptr);
     if (!_window) {
         throw std::runtime_error("Fail to create a window.");
     }
@@ -195,4 +203,3 @@ void Window::TermWindow() {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-
