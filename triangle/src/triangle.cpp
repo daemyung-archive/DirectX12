@@ -53,7 +53,7 @@ public:
     }
 
 protected:
-    void OnBuildDescriptors() override {
+    void OnInit() override {
         // Set the first CPU descriptor handle of RTV heap.
         CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
                 _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart());
@@ -66,10 +66,23 @@ protected:
         }
     }
 
-    void OnUpdateUniforms(UINT index) override {
+    void OnTerm() override {
     }
 
-    void OnUpdateImGui() override {
+    void OnResize(const Resolution& resolution) override {
+        // Set the first CPU descriptor handle of RTV heap.
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
+                _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart());
+
+        // Initialize swap chain views.
+        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
+            _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, rtv);
+            swap_chain_views[i] = rtv;
+            rtv.Offset(_descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]);
+        }
+    }
+
+    void OnUpdate(UINT index) override {
         if (ImGui::CollapsingHeader("Options", ImGuiTreeNodeFlags_DefaultOpen)) {
             if (ImGui::Checkbox("Use staging buffer", &_options.use_staging_buffer)) {
                 WaitCommandQueueIdle();
@@ -78,7 +91,7 @@ protected:
         }
     }
 
-    void OnBuildCommands(UINT index) override {
+    void OnRender(UINT index) override {
         FLOAT clear_color[4] = {};
         D3D12_VIEWPORT viewport = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
         D3D12_RECT scissor_rect = {};

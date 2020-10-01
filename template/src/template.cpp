@@ -22,7 +22,7 @@ public:
     }
 
 protected:
-    void OnBuildDescriptors() override {
+    void OnInit() override {
         D3D12_CPU_DESCRIPTOR_HANDLE handle;
 
         handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
@@ -32,13 +32,23 @@ protected:
         }
     }
 
-    void OnUpdateUniforms(UINT index) override {
+    void OnTerm() override {
     }
 
-    virtual void OnUpdateImGui() {
+    void OnResize(const Resolution& resolution) override {
+        D3D12_CPU_DESCRIPTOR_HANDLE handle;
+
+        handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
+        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
+            _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, handle);
+            handle.ptr += _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
+        }
     }
 
-    void OnBuildCommands(UINT index) override {
+    void OnUpdate(UINT index) override {
+    }
+
+    void OnRender(UINT index) override {
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Transition.pResource = _swap_chain_buffers[index].Get();

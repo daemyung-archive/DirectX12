@@ -45,19 +45,37 @@ void Example::BindToWindow(Window *window) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::Init() {
-    // Build descriptors.
-    OnBuildDescriptors();
+    // Initialize by an example.
+    OnInit();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::Term() {
     WaitCommandQueueIdle();
+
+    // Terminate by an example.
+    OnTerm();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Example::Render() {
+void Example::Resize(const Resolution &resolution) {
+    // Resize swap chain buffers.
+    WaitCommandQueueIdle();
+    _swap_chain_buffers.fill(nullptr);
+    _swap_chain->ResizeBuffers(kSwapChainBufferCount, GetWidth(resolution), GetHeight(resolution), kSwapChainFormat,
+                               0);
+    InitSwapChainBuffers();
+
+    // Resize by an example.
+    OnResize(resolution);
+    _resolution = resolution;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::Update() {
     // Retrieve the current index of a swap chain.
     auto index = _swap_chain->GetCurrentBackBufferIndex();
     assert(index < kSwapChainBufferCount);
@@ -68,18 +86,23 @@ void Example::Render() {
         WaitForSingleObject(_event, INFINITE);
     }
 
-    // Update ImGui.
+    // Update by an example.
     BeginImGuiPass();
-    OnUpdateImGui();
+    OnUpdate(index);
     EndImGuiPass();
+}
 
-    // Update uniforms.
-    OnUpdateUniforms(_swap_chain->GetCurrentBackBufferIndex());
+//----------------------------------------------------------------------------------------------------------------------
 
-    // Record commands.
+void Example::Render() {
+    // Retrieve the current index of a swap chain.
+    auto index = _swap_chain->GetCurrentBackBufferIndex();
+    assert(index < kSwapChainBufferCount);
+
+    // Render by an example.
     ThrowIfFailed(_command_allocators[index]->Reset());
     ThrowIfFailed(_command_list->Reset(_command_allocators[index].Get(), nullptr));
-    OnBuildCommands(index);
+    OnRender(index);
     ThrowIfFailed(_command_list->Close());
 
     // Execute a command list.

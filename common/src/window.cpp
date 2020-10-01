@@ -72,6 +72,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         return 1;
     }
 
+    auto example = reinterpret_cast<Example *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     switch (uMsg) {
         case WM_CREATE: {
             auto data = reinterpret_cast<LPCREATESTRUCT>(lParam)->lpCreateParams;
@@ -82,8 +83,12 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             PostQuitMessage(0);
             return 0;
         }
+        case WM_SIZE: {
+            example->Resize({LOWORD(lParam), HIWORD(lParam)});
+            return 0;
+        }
         case WM_PAINT: {
-            auto example = reinterpret_cast<Example *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+            example->Update();
             example->Render();
             return 0;
         }

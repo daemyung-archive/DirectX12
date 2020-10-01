@@ -62,6 +62,13 @@ public:
     //! Terminate.
     void Term();
 
+    //! Resize.
+    //! \param resolution A resolution.
+    void Resize(const Resolution& resolution);
+
+    //! Update.
+    void Update();
+
     //! Render.
     void Render();
 
@@ -79,19 +86,23 @@ protected:
     //! Wait until a command queue is idle.
     void WaitCommandQueueIdle();
 
-    //! Handle build descriptors event.
-    virtual void OnBuildDescriptors() = 0;
+    //! Handle initialize event.
+    virtual void OnInit() = 0;
 
-    //! Handle update uniforms event.
+    //! Handle terminate event.
+    virtual void OnTerm() = 0;
+
+    //! Handle resize event.
+    //! \param resolution A resolution.
+    virtual void OnResize(const Resolution& resolution) = 0;
+
+    //! Handle update event.
     //! \param index The current index of swap chain image.
-    virtual void OnUpdateUniforms(UINT index) = 0;
+    virtual void OnUpdate(UINT index) = 0;
 
-    //! Update ImGuI.
-    virtual void OnUpdateImGui() = 0;
-
-    //! Handle build commands event.
+    //! Handle render event.
     //! \param index The current index of swap chain image.
-    virtual void OnBuildCommands(UINT index) = 0;
+    virtual void OnRender(UINT index) = 0;
 
 protected:
     //! Initialize a factory.
