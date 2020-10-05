@@ -18,6 +18,7 @@
 #include <unordered_map>
 
 #include "utility.h"
+#include "timer.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -153,6 +154,10 @@ protected:
 
 protected:
     std::string _title;
+    Timer _timer;
+    UINT _cps = 0;
+    UINT _fps = 0;
+    Duration _fps_time = Duration::zero();
     ComPtr<IDXGIFactory7> _factory;
     ComPtr<IDXGIAdapter4> _adapter;
     DXGI_ADAPTER_DESC3 _adapter_desc;

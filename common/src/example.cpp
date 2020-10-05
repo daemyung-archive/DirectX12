@@ -10,6 +10,8 @@
 
 #include "window.h"
 
+using namespace std::chrono_literals;
+
 //----------------------------------------------------------------------------------------------------------------------
 
 Example::Example(const std::string &title,
@@ -45,6 +47,8 @@ void Example::BindToWindow(Window *window) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::Init() {
+    _timer.Start();
+
     // Initialize by an example.
     OnInit();
 }
@@ -56,6 +60,8 @@ void Example::Term() {
 
     // Terminate by an example.
     OnTerm();
+
+    _timer.Stop();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,6 +81,18 @@ void Example::Resize(const Resolution &resolution) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::Update() {
+    _timer.Tick();
+
+    // Calculate FPS.
+    auto elapsed_time = _timer.GetElapsedTime();
+    if (elapsed_time - _fps_time > 1s) {
+        _fps = _cps;
+        _fps_time = elapsed_time;
+        _cps = 0;
+    } else {
+        ++_cps;
+    }
+
     // Retrieve the current index of a swap chain.
     auto index = _swap_chain->GetCurrentBackBufferIndex();
     assert(index < kSwapChainBufferCount);
@@ -318,6 +336,7 @@ void Example::BeginImGuiPass() {
                  ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     ImGui::TextUnformatted(_title.c_str());
     ImGui::TextUnformatted(ConvertUTF16ToUTF8(_adapter_desc.Description).c_str());
+    ImGui::Text("%.2f ms/frame(%u FPS)", _timer.GetDeltaTime().count(), _fps);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -8,10 +8,12 @@ add_library(common
            include/common/window.h
            include/common/example.h
            include/common/uploader.h
+           include/common/timer.h
                src/utility.cpp
                src/window.cpp
                src/example.cpp
-               src/uploader.cpp)
+               src/uploader.cpp
+               src/timer.cpp)
 
 target_include_directories(common
     PUBLIC  include
