@@ -20,6 +20,14 @@ struct Vertex {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+struct Transformation {
+    XMFLOAT4X4 projection;
+    XMFLOAT4X4 view;
+    XMFLOAT4X4 model;
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
 struct Options {
     bool use_staging_buffer = true;
 };
@@ -59,7 +67,7 @@ protected:
     void OnTerm() override {
     }
 
-    void OnResize(const Resolution& resolution) override {
+    void OnResize(const Resolution &resolution) override {
         // Update a viewport.
         _viewport.Width = static_cast<float>(GetWidth(resolution));
         _viewport.Height = static_cast<float>(GetHeight(resolution));
@@ -81,12 +89,22 @@ protected:
     }
 
     void OnUpdate(UINT index) override {
+        // Update ImGui.
         if (ImGui::CollapsingHeader("Options", ImGuiTreeNodeFlags_DefaultOpen)) {
             if (ImGui::Checkbox("Use staging buffer", &_options.use_staging_buffer)) {
                 WaitCommandQueueIdle();
                 InitResources();
             }
         }
+
+        // Define transformation.
+        Transformation transformation;
+        transformation.projection = _camera.GetProjection();
+        transformation.view = _camera.GetView();
+        transformation.model = kIdentityFloat4x4;
+
+        // Update transformation.
+        UpdateBuffer(_constant_buffers[index].Get(), &transformation, sizeof(Transformation));
     }
 
     void OnRender(UINT index) override {
@@ -117,6 +135,7 @@ protected:
         _command_list->RSSetViewports(1, &_viewport);
         _command_list->RSSetScissorRects(1, &_scissor_rect);
         _command_list->SetGraphicsRootSignature(_root_signature.Get());
+        _command_list->SetGraphicsRootConstantBufferView(0, _constant_buffers[index]->GetGPUVirtualAddress());
         _command_list->SetPipelineState(_pipeline_state.Get());
         _command_list->IASetVertexBuffers(0, 1, &_vertex_buffer_view);
         _command_list->IASetIndexBuffer(&_index_buffer_view);
@@ -166,6 +185,11 @@ private:
             UpdateBuffer(_index_buffer.Get(), indices, sizeof(indices));
         }
 
+        // Initialize constant buffers.
+        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
+            ThrowIfFailed(CreateConstantBuffer(_device.Get(), sizeof(Transformation), &_constant_buffers[i]));
+        }
+
         // Initialize a vertex buffer view.
         _vertex_buffer_view.BufferLocation = _vertex_buffer->GetGPUVirtualAddress();
         _vertex_buffer_view.SizeInBytes = sizeof(vertices);
@@ -183,8 +207,12 @@ private:
                 {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
                 {"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}};
 
+        // Define a root parameter.
+        CD3DX12_ROOT_PARAMETER root_parameter;
+        root_parameter.InitAsConstantBufferView(0);
+
         // Define a root signature.
-        CD3DX12_ROOT_SIGNATURE_DESC root_signature_desc(0, nullptr, 0, nullptr,
+        CD3DX12_ROOT_SIGNATURE_DESC root_signature_desc(1, &root_parameter, 0, nullptr,
                                                         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
         // Create a root signature.
@@ -205,7 +233,9 @@ private:
         desc.VS = {reinterpret_cast<BYTE *>(vertex_shader->GetBufferPointer()), vertex_shader->GetBufferSize()};
         desc.PS = {reinterpret_cast<BYTE *>(pixel_shader->GetBufferPointer()), pixel_shader->GetBufferSize()};
         desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+        desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
         desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+        desc.DepthStencilState.DepthEnable = false;
         desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
         desc.SampleMask = UINT_MAX;
         desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -221,6 +251,7 @@ private:
     Options _options;
     ComPtr<ID3D12Resource> _vertex_buffer;
     ComPtr<ID3D12Resource> _index_buffer;
+    FrameResource<ID3D12Resource> _constant_buffers;
     D3D12_VERTEX_BUFFER_VIEW _vertex_buffer_view = {};
     D3D12_INDEX_BUFFER_VIEW _index_buffer_view = {};
     ComPtr<ID3D12RootSignature> _root_signature;

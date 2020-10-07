@@ -9,11 +9,13 @@ add_library(common
            include/common/example.h
            include/common/uploader.h
            include/common/timer.h
+           include/common/camera.h
                src/utility.cpp
                src/window.cpp
                src/example.cpp
                src/uploader.cpp
-               src/timer.cpp)
+               src/timer.cpp
+               src/camera.cpp)
 
 target_include_directories(common
     PUBLIC  include

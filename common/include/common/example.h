@@ -10,23 +10,19 @@
 #include <d3dx12.h>
 #include <wrl.h>
 #include <dxgi1_6.h>
-#include <d3d12.h>
-#include <DirectXMath.h>
 #include <DirectXColors.h>
 #include <string>
 #include <array>
 #include <unordered_map>
 
 #include "utility.h"
+#include "window.h"
 #include "timer.h"
+#include "camera.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 using Microsoft::WRL::ComPtr;
-
-//----------------------------------------------------------------------------------------------------------------------
-
-class Window;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -64,13 +60,32 @@ public:
 
     //! Resize.
     //! \param resolution A resolution.
-    void Resize(const Resolution& resolution);
+    void Resize(const Resolution &resolution);
 
     //! Update.
     void Update();
 
     //! Render.
     void Render();
+
+    //! Handle mouse button down event.
+    //! \param button The button that is pressing.
+    //! \param position A position of the mouse cursor.
+    void OnMouseButtonDown(MouseButton button, const POINT &position);
+
+    //! Handle mouse button up event.
+    //! \param button The button that is releasing.
+    //! \param position A position of the mouse cursor.
+    void OnMouseButtonUp(MouseButton button, const POINT &position);
+
+    //! Handle mouse move event.
+    //! \param button The button that is pressing.
+    //! \param position A position of the mouse cursor.
+    void OnMouseMove(MouseButton button, const POINT &position);
+
+    //! Handle mouse wheel event.
+    //! \param delta The rotated distance by wheel.
+    void OnMouseWheel(float delta);
 
 protected:
     //! Record draw commands for ImGui.
@@ -87,7 +102,7 @@ protected:
 
     //! Handle resize event.
     //! \param resolution A resolution.
-    virtual void OnResize(const Resolution& resolution) = 0;
+    virtual void OnResize(const Resolution &resolution) = 0;
 
     //! Handle update event.
     //! \param index The current index of swap chain image.
@@ -158,6 +173,8 @@ protected:
     UINT _cps = 0;
     UINT _fps = 0;
     Duration _fps_time = Duration::zero();
+    Camera _camera;
+    POINT _mouse_position = {0, 0};
     ComPtr<IDXGIFactory7> _factory;
     ComPtr<IDXGIAdapter4> _adapter;
     DXGI_ADAPTER_DESC3 _adapter_desc;

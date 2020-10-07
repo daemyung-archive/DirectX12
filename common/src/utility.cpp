@@ -110,4 +110,12 @@ void UpdateBuffer(ID3D12Resource *buffer, void *data, UINT64 size) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer) {
+    return CreateBuffer(device, D3D12_HEAP_TYPE_UPLOAD,
+                        AlignPow2(sizeof(size), D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT),
+                        D3D12_RESOURCE_STATE_GENERIC_READ, buffer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 #pragma clang diagnostic pop

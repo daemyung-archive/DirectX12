@@ -67,6 +67,8 @@ void Example::Term() {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::Resize(const Resolution &resolution) {
+    _camera.SetAspectRatio(GetAspectRatio(resolution));
+
     // Resize swap chain buffers.
     WaitCommandQueueIdle();
     _swap_chain_buffers.fill(nullptr);
@@ -130,6 +132,34 @@ void Example::Render() {
 
     // Preset a swap chain image.
     ThrowIfFailed(_swap_chain->Present(0, 0));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::OnMouseButtonDown(MouseButton button, const POINT &position) {
+    _mouse_position = position;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::OnMouseButtonUp(MouseButton button, const POINT &position) {
+    _mouse_position = position;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::OnMouseMove(MouseButton button, const POINT &position) {
+    if (button == MouseButton::kLeft) {
+        _camera.RotateBy({static_cast<float>(position.x - _mouse_position.x),
+                          static_cast<float>(position.y - _mouse_position.y)});
+    }
+    _mouse_position = position;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::OnMouseWheel(float delta) {
+    _camera.ZoomBy(delta);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

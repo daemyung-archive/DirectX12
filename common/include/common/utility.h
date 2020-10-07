@@ -8,10 +8,18 @@
 
 #include <Windows.h>
 #include <d3d12.h>
+#include <DirectXMath.h>
 #include <fmt/format.h>
 #include <stdexcept>
 #include <tuple>
 #include <filesystem>
+
+//----------------------------------------------------------------------------------------------------------------------
+
+static const DirectX::XMFLOAT4X4 kIdentityFloat4x4 = {1.0f, 0.0f, 0.0f, 0.0f,
+                                                      0.0f, 1.0f, 0.0f, 0.0f,
+                                                      0.0f, 0.0f, 1.0f, 0.0f,
+                                                      0.0f, 0.0f, 0.0f, 1.0f};
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +41,27 @@ inline auto GetWidth(const Resolution &resolution) {
 //! \return A height.
 inline auto GetHeight(const Resolution &resolution) {
     return std::get<1>(resolution);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Retrieve an aspect ratio of a resolution.
+//! \param resolution A resolution.
+//! \return An aspect ratio.
+inline auto GetAspectRatio(const Resolution &resolution) {
+    return GetWidth(resolution) / static_cast<float>(GetHeight(resolution));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Rounds the specified value up to the nearest value meeting the specified alignment.
+//! Only power of 2 alignments are supported by this function.
+//! \param value A value.
+//! \param alignment A power of 2 alignment.
+//! \return An aligned value.
+template<typename T>
+T AlignPow2(T value, UINT64 alignment) {
+    return ((value + static_cast<T>(alignment) - 1) & ~(static_cast<T>(alignment) - 1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,7 +144,7 @@ extern HRESULT CreateDefaultBuffer(ID3D12Device *device, UINT64 size, ID3D12Reso
 //! \param device A DirectX12 device.
 //! \param size The byte size of a buffer.
 //! \param buffer A pointer to a memory block that receives a pointer to ID3D12Resource.
-//! \return A result
+//! \return A result.
 [[maybe_unused]]
 extern HRESULT CreateUploadBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer);
 
@@ -126,6 +155,15 @@ extern HRESULT CreateUploadBuffer(ID3D12Device *device, UINT64 size, ID3D12Resou
 //! \param data The data to be initialized to a buffer.
 //! \param size The byte size of a buffer.
 extern void UpdateBuffer(ID3D12Resource *buffer, void *data, UINT64 size);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Create a constant buffer which has the upload heap and aligned size by 256.
+//! \param device A DirectX12 device.
+//! \param size The byte size of a buffer. It will be aligned by 256.
+//! \param buffer A pointer to a memory block that receives a pointer to ID3D12Resource.
+//! \return A result.
+extern HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer);
 
 //----------------------------------------------------------------------------------------------------------------------
 

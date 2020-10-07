@@ -8,9 +8,17 @@ struct Output {
     float3 color    : COLOR;
 };
 
+cbuffer Transformation : register(b0) {
+    float4x4 projection;
+    float4x4 view;
+    float4x4 model;
+};
+
 Output VSMain(Input input) {
+    float4x4 PVM = mul(mul(projection, view), model);
+
     Output output;
-    output.position = float4(input.position, 1.0);
+    output.position = mul(PVM, float4(input.position, 1.0));
     output.color = input.color;
     return output;
 }

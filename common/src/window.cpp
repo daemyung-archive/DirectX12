@@ -7,6 +7,7 @@
 
 #include <imgui_impl_win32.h>
 #include <combaseapi.h>
+#include <windowsx.h>
 #include <stdexcept>
 #include <array>
 #include <tuple>
@@ -85,6 +86,28 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_PAINT: {
             example->Update();
             example->Render();
+            return 0;
+        }
+        case WM_LBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_RBUTTONDOWN: {
+            example->OnMouseButtonDown(static_cast<MouseButton>(wParam), {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            SetCapture(hWnd);
+            return 0;
+        }
+        case WM_LBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_RBUTTONUP: {
+            ReleaseCapture();
+            example->OnMouseButtonUp(static_cast<MouseButton>(wParam), {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            return 0;
+        }
+        case WM_MOUSEMOVE: {
+            example->OnMouseMove(static_cast<MouseButton>(wParam), {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            return 0;
+        }
+        case WM_MOUSEWHEEL: {
+            example->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam) / static_cast<float>(WHEEL_DELTA));
             return 0;
         }
         default: {
