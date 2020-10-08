@@ -11,8 +11,10 @@
 
 #include "utility.h"
 
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Waddress-of-temporary"
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +56,8 @@ void Uploader::RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size) {
 
     // Record commands.
     UpdateSubresources<1>(_command_lists[0].Get(), buffer, upload_buffer.Get(), 0, 0, 1, &copy_desc);
-    _command_lists[1]->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(buffer, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
+    _command_lists[1]->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(buffer, D3D12_RESOURCE_STATE_COPY_DEST,
+                                                                                D3D12_RESOURCE_STATE_GENERIC_READ));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,7 +68,7 @@ void Uploader::Execute() {
         _command_lists[i]->Close();
     }
 
-    ID3D12CommandList* command_lists[] {_command_lists[0].Get(), _command_lists[1].Get()};
+    ID3D12CommandList *command_lists[]{_command_lists[0].Get(), _command_lists[1].Get()};
 
     // Execute copy commands.
     _command_queues[0]->ExecuteCommandLists(1, &command_lists[0]);
@@ -139,4 +142,6 @@ void Uploader::TermEvent() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
