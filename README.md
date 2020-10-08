@@ -2,12 +2,16 @@
 A comprehensive collection of open source C++ examples for DirectX12, the new generation graphics and compute API from Microsoft.
 
 ## Table of contents
++ [Status](#status)
 + [Requirements](#requirements)
 + [Clone](#clone)
 + [Generate the project](#generate-the-project)
 + [Examples](#examples)
     + [Triangle](https://github.com/daemyung/DirectX12/tree/master/triangle)
 + [Open sources](#open-sources)
+
+## Status
+![CMake](https://github.com/daemyung/DirectX12/workflows/CMake/badge.svg)
 
 ## Requirements
 + [Git](https://git-scm.com/downloads)
