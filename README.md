@@ -14,6 +14,7 @@ A comprehensive collection of open source C++ examples for DirectX12, the new ge
 ![CMake](https://github.com/daemyung/DirectX12/workflows/CMake/badge.svg)
 
 ## Requirements
++ [Windows 10 SDK(10.0.19041.0)](https://developer.microsoft.com/ko-kr/windows/downloads/windows-10-sdk/)
 + [Git](https://git-scm.com/downloads)
 + [CMake](https://cmake.org/download/)
 
