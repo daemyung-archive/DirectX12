@@ -340,7 +340,7 @@ void Example::InitImGui(Window *window) {
     CD3DX12_CPU_DESCRIPTOR_HANDLE cpu_handle(descriptor_heap->GetCPUDescriptorHandleForHeapStart());
     cpu_handle.Offset(offset, size);
     CD3DX12_GPU_DESCRIPTOR_HANDLE gpu_handle(descriptor_heap->GetGPUDescriptorHandleForHeapStart());
-    cpu_handle.Offset(offset, size);
+    gpu_handle.Offset(offset, size);
 
     // Initialize ImGUI for DirectX12.
     ImGui_ImplDX12_Init(_device.Get(), kSwapChainBufferCount, kSwapChainFormat, descriptor_heap,
