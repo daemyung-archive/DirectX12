@@ -9,13 +9,10 @@ using namespace DirectX;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const auto kUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-//----------------------------------------------------------------------------------------------------------------------
-
 Camera::Camera() {
-    UpdateProjection();
+    UpdatePosition();
     UpdateView();
+    UpdateProjection();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -37,7 +34,8 @@ void Camera::RotateBy(const DirectX::XMFLOAT2 &delta) {
     if (abs(delta.x) > FLT_EPSILON || abs(delta.y) > FLT_EPSILON) {
         if (_mode == CameraMode::kArcball) {
             _phi -= XMConvertToRadians(delta.x);
-            _theta += XMConvertToRadians(delta.y);
+            _theta = std::clamp(_theta + XMConvertToRadians(delta.y), -XM_PIDIV2, XM_PIDIV2);
+            UpdatePosition();
             UpdateView();
         } else {
             assert(false);
@@ -56,6 +54,18 @@ void Camera::SetAspectRatio(float aspect_ratio) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+void Camera::UpdatePosition() {
+    if (_mode == CameraMode::kArcball) {
+        _position = {_radius * cosf(_theta) * cosf(_phi),
+                     _radius * sinf(_theta),
+                     _radius * cosf(_theta) * sinf(_phi)};
+    } else {
+        assert(false);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 void Camera::UpdateProjection() {
     XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(_fov, _aspect_ratio, _near, _far));
 }
@@ -63,14 +73,10 @@ void Camera::UpdateProjection() {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Camera::UpdateView() {
-    if (_mode == CameraMode::kArcball) {
-        auto position = XMVectorSet(_radius * cosf(_theta) * cosf(_phi),
-                                    _radius * sinf(_theta),
-                                    _radius * cosf(_theta) * sinf(_phi),
-                                    1.0f);
-        auto target = XMLoadFloat3(&_target);
-        XMStoreFloat4x4(&_view, XMMatrixLookAtLH(position, target, kUp));
-    }
+    auto position = XMLoadFloat3(&_position);
+    auto target = XMLoadFloat3(&_target);
+    XMStoreFloat3(&_forward, XMVectorSubtract(position, target));
+    XMStoreFloat4x4(&_view, XMMatrixLookAtLH(position, target, kYAxisVector));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

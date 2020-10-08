@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+static const auto kXAxisVector = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+static const auto kYAxisVector = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+static const auto kZAxisVector = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+static const DirectX::XMFLOAT3 kZeroFloat3 = {0.0f, 0.0f, 0.0f};
 static const DirectX::XMFLOAT4X4 kIdentityFloat4x4 = {1.0f, 0.0f, 0.0f, 0.0f,
                                                       0.0f, 1.0f, 0.0f, 0.0f,
                                                       0.0f, 0.0f, 1.0f, 0.0f,
