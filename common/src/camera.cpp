@@ -21,6 +21,7 @@ void Camera::ZoomBy(float amount) {
     if (abs(amount) > FLT_EPSILON) {
         if (_mode == CameraMode::kArcball) {
             _radius = std::max(_radius - amount, 1.0f);
+            UpdatePosition();
             UpdateView();
         } else {
             assert(false);
@@ -59,6 +60,8 @@ void Camera::UpdatePosition() {
         _position = {_radius * cosf(_theta) * cosf(_phi),
                      _radius * sinf(_theta),
                      _radius * cosf(_theta) * sinf(_phi)};
+
+
     } else {
         assert(false);
     }
