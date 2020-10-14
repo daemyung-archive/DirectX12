@@ -8,6 +8,7 @@
 #include <d3dx12.h>
 #include <dxgi1_6.h>
 #include <array>
+#include <algorithm>
 
 #include "utility.h"
 
@@ -56,13 +57,47 @@ void Uploader::RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size) {
 
     // Record commands.
     UpdateSubresources<1>(_command_lists[0].Get(), buffer, upload_buffer.Get(), 0, 0, 1, &copy_desc);
-    _command_lists[1]->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(buffer, D3D12_RESOURCE_STATE_COPY_DEST,
-                                                                                D3D12_RESOURCE_STATE_GENERIC_READ));
+    _resource_barriers[buffer] = CD3DX12_RESOURCE_BARRIER::Transition(buffer, D3D12_RESOURCE_STATE_COPY_DEST,
+                                                                      D3D12_RESOURCE_STATE_GENERIC_READ);
+}
+
+void Uploader::RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void *data, UINT64 size) {
+    // Retrieve information to create an upload buffer.
+    D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
+    UINT height;
+    UINT64 row_pitch;
+    UINT64 required_size;
+    _device->GetCopyableFootprints(&buffer->GetDesc(), mip_slice, 1, 0, &layout, &height, &row_pitch, &required_size);
+
+    // Create an upload buffer.
+    ComPtr<ID3D12Resource> upload_buffer;
+    ThrowIfFailed(CreateUploadBuffer(_device, required_size, &upload_buffer));
+
+    // Keep an upload buffer until a command list is completed.
+    _upload_buffers.push_back(upload_buffer);
+
+    // Define a subresource data.
+    D3D12_SUBRESOURCE_DATA copy_desc = {};
+    copy_desc.pData = data;
+    copy_desc.RowPitch = row_pitch;
+    copy_desc.SlicePitch = copy_desc.RowPitch * height;
+
+    // Record commands.
+    UpdateSubresources<1>(_command_lists[0].Get(), buffer, upload_buffer.Get(), 0, mip_slice, 1, &copy_desc);
+    _resource_barriers[buffer] = CD3DX12_RESOURCE_BARRIER::Transition(buffer, D3D12_RESOURCE_STATE_COPY_DEST,
+                                                                      D3D12_RESOURCE_STATE_GENERIC_READ);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void Uploader::Execute() {
+    // Record resource barrier commands.
+    std::vector<D3D12_RESOURCE_BARRIER> resource_barriers;
+    std::transform(std::begin(_resource_barriers), std::end(_resource_barriers), std::back_inserter(resource_barriers),
+                   [](const auto &pair) { return pair.second; });
+    _command_lists[1]->ResourceBarrier(static_cast<UINT>(resource_barriers.size()), resource_barriers.data());
+    _resource_barriers.clear();
+
     // Finish recording command lists.
     for (auto i = 0; i != 2; ++i) {
         _command_lists[i]->Close();

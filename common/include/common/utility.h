@@ -73,7 +73,14 @@ T AlignPow2(T value, UINT64 alignment) {
 //! Convert from UTF16 to UTF8.
 //! \param utf16 A UTF16 string.
 //! \return A UTF8 string.
-std::string ConvertUTF16ToUTF8(wchar_t *utf16);
+extern std::string ConvertUTF16ToUTF8(wchar_t *utf16);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Read a file.
+//! \param path The file path.
+//! \return A contents of file.
+extern std::vector<BYTE> ReadFile(const std::filesystem::path &path);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -168,6 +175,26 @@ extern void UpdateBuffer(ID3D12Resource *buffer, void *data, UINT64 size);
 //! \param buffer A pointer to a memory block that receives a pointer to ID3D12Resource.
 //! \return A result.
 extern HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Create a default texture 2D.
+//! \param device A DirectX12 device.
+//! \param width The width of a texture.
+//! \param height The height of a texture.
+//! \param mip_levels The mip levels of a texture.
+//! \param format The texture format.
+//! \param buffer A pointer to a memory block that receives a pointer to ID3D12Resource.
+//! \return A result.
+extern HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
+                                      DXGI_FORMAT format, ID3D12Resource **buffer);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Calculate the inverse transpose matrix.
+//! \param float4x4 A matrix for calculating the inverse transpose matrix.
+//! \return A inverse transpose matrix.
+extern DirectX::XMFLOAT3X4 XMMatrixInverseTranspose(const DirectX::XMFLOAT4X4 &float4x4);
 
 //----------------------------------------------------------------------------------------------------------------------
 

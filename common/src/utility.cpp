@@ -8,6 +8,7 @@
 #include <d3dx12.h>
 #include <d3dcompiler.h>
 #include <iostream>
+#include <fstream>
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -16,7 +17,17 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+using namespace DirectX;
 using Microsoft::WRL::ComPtr;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 size,
+                            D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
+    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
+                                           &CD3DX12_RESOURCE_DESC::Buffer(size), resource_state,
+                                           nullptr, IID_PPV_ARGS(buffer));
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -29,11 +40,9 @@ std::string ConvertUTF16ToUTF8(wchar_t *utf16) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 size,
-                            D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
-    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
-                                           &CD3DX12_RESOURCE_DESC::Buffer(size), resource_state,
-                                           nullptr, IID_PPV_ARGS(buffer));
+std::vector<BYTE> ReadFile(const std::filesystem::path &path) {
+    std::basic_ifstream<BYTE> fin(path, std::ios::in | std::ios::binary);
+    return std::vector<BYTE>(std::istreambuf_iterator<BYTE>(fin), std::istreambuf_iterator<BYTE>());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,6 +125,38 @@ HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource *
     return CreateBuffer(device, D3D12_HEAP_TYPE_UPLOAD,
                         AlignPow2(size, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT),
                         D3D12_RESOURCE_STATE_GENERIC_READ, buffer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
+                               DXGI_FORMAT format, ID3D12Resource **buffer) {
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Width = width;
+    desc.Height = height;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = mip_levels;
+    desc.Format = format;
+    desc.SampleDesc = {1, 0};
+
+    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+                                           &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(buffer));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+DirectX::XMFLOAT3X4 XMMatrixInverseTranspose(const DirectX::XMFLOAT4X4 &float4x4) {
+    XMMATRIX matrix = XMMatrixSet(float4x4._11, float4x4._12, float4x4._13, float4x4._14,
+                                  float4x4._21, float4x4._22, float4x4._23, float4x4._24,
+                                  float4x4._31, float4x4._32, float4x4._33, float4x4._34,
+                                  0.0f, 0.0f, 0.0f, 1.0f);
+    XMVECTOR determinant = XMMatrixDeterminant(matrix);
+    matrix = XMMatrixTranspose(XMMatrixInverse(&determinant, matrix));
+
+    XMFLOAT3X4 float3x4;
+    XMStoreFloat3x4(&float3x4, matrix);
+    return float3x4;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

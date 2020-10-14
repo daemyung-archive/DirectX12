@@ -9,6 +9,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <vector>
+#include <unordered_map>
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +31,13 @@ public:
     //! \param data The data will be copied to a destination buffer.
     //! \param size A size of the data.
     void RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size);
+
+    //! Record a copy data command.
+    //! \param buffer A destination buffer.
+    //! \param mip_slice The mip slice of a destination buffer.
+    //! \param data The data will be copied to a destination buffer.
+    //! \param size A size of the data.
+    void RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void *data, UINT64 size);
 
     //! Execute recorded copy data commands.
     void Execute();
@@ -61,6 +69,7 @@ private:
     ComPtr<ID3D12Fence> _fence;
     HANDLE _event = nullptr;
     std::vector<ComPtr<ID3D12Resource>> _upload_buffers;
+    std::unordered_map<ID3D12Resource*, D3D12_RESOURCE_BARRIER> _resource_barriers;
 };
 
 //----------------------------------------------------------------------------------------------------------------------

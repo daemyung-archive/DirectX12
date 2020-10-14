@@ -91,23 +91,34 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_LBUTTONDOWN:
         case WM_MBUTTONDOWN:
         case WM_RBUTTONDOWN: {
-            example->OnMouseButtonDown(static_cast<MouseButton>(wParam), {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
-            SetCapture(hWnd);
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                example->OnMouseButtonDown(static_cast<MouseButton>(wParam),
+                                           {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+                SetCapture(hWnd);
+            }
             return 0;
         }
         case WM_LBUTTONUP:
         case WM_MBUTTONUP:
         case WM_RBUTTONUP: {
-            ReleaseCapture();
-            example->OnMouseButtonUp(static_cast<MouseButton>(wParam), {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                ReleaseCapture();
+                example->OnMouseButtonUp(static_cast<MouseButton>(wParam),
+                                         {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            }
             return 0;
         }
         case WM_MOUSEMOVE: {
-            example->OnMouseMove(static_cast<MouseButton>(wParam), {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                example->OnMouseMove(static_cast<MouseButton>(wParam),
+                                     {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)});
+            }
             return 0;
         }
         case WM_MOUSEWHEEL: {
-            example->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam) / static_cast<float>(WHEEL_DELTA));
+            if (!ImGui::GetIO().WantCaptureMouse) {
+                example->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam) / static_cast<float>(WHEEL_DELTA));
+            }
             return 0;
         }
         default: {
