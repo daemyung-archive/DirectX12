@@ -35,3 +35,4 @@ cmake ..
 + [D3D12 helper library](https://github.com/Microsoft/DirectX-Graphics-Samples/tree/master/Libraries/D3DX12)
 + [fmt](https://github.com/fmtlib/fmt)
 + [Dear ImGui](https://github.com/ocornut/imgui)
++ [dds-ktx](https://github.com/septag/dds-ktx)

@@ -9,6 +9,7 @@ add_library(external
            include/imgui.h
            include/imgui_impl_dx12.h
            include/imgui_impl_win32.h
+           include/dds-ktx.h
            include/fmt/core.h
            include/fmt/format.h
            include/fmt/format-inl.h
