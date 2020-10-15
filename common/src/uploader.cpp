@@ -63,11 +63,12 @@ void Uploader::RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size) {
 
 void Uploader::RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void *data, UINT64 size) {
     // Retrieve information to create an upload buffer.
+    auto desc = buffer->GetDesc();
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
     UINT height;
     UINT64 row_pitch;
     UINT64 required_size;
-    _device->GetCopyableFootprints(&buffer->GetDesc(), mip_slice, 1, 0, &layout, &height, &row_pitch, &required_size);
+    _device->GetCopyableFootprints(&desc, mip_slice, 1, 0, &layout, &height, &row_pitch, &required_size);
 
     // Create an upload buffer.
     ComPtr<ID3D12Resource> upload_buffer;
@@ -83,7 +84,8 @@ void Uploader::RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void
     copy_desc.SlicePitch = copy_desc.RowPitch * height;
 
     // Record commands.
-    UpdateSubresources<1>(_command_lists[0].Get(), buffer, upload_buffer.Get(), 0, mip_slice, 1, &copy_desc);
+    auto subresource = D3D12CalcSubresource(mip_slice, 0, 0, desc.MipLevels, desc.DepthOrArraySize);
+    UpdateSubresources<1>(_command_lists[0].Get(), buffer, upload_buffer.Get(), 0, subresource, 1, &copy_desc);
     _resource_barriers[buffer] = CD3DX12_RESOURCE_BARRIER::Transition(buffer, D3D12_RESOURCE_STATE_COPY_DEST,
                                                                       D3D12_RESOURCE_STATE_GENERIC_READ);
 }

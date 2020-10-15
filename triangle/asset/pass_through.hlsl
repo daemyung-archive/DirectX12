@@ -8,7 +8,7 @@ struct Output {
     float3 color    : COLOR;
 };
 
-cbuffer Transformation : register(b0) {
+cbuffer Transformations : register(b0) {
     float4x4 projection;
     float4x4 view;
     float4x4 model;

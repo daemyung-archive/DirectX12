@@ -26,7 +26,7 @@ struct Vertex {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-struct Constant {
+struct Constants {
     XMFLOAT4X4 projection;
     XMFLOAT4X4 view;
     XMFLOAT4X4 model;
@@ -106,25 +106,26 @@ protected:
             ImGui::ColorPicker3("Light color", _options.light_color.data(),
                                 ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_DisplayRGB);
             ImGui::SliderFloat3("Light direction", _options.light_direction.data(), -1.0f, 1.0f);
+            ImGui::Separator();
             ImGui::SliderInt("Mip slice", &_options.mip_slice, 0, 9);
         }
 
-        // Define constant.
-        Constant constant;
-        constant.projection = _camera.GetProjection();
-        constant.view = _camera.GetView();
-        XMStoreFloat4x4(&constant.model, XMMatrixRotationY(XM_PI));
-        constant.normal = XMMatrixInverseTranspose(constant.model);
-        constant.view_direction = _camera.GetForward();
-        constant.light_distance = _options.light_distance;
-        constant.light_position = XMFLOAT3(_options.light_position.data());
-        constant.light_spot_power = _options.light_spot_power;
-        constant.light_color = XMFLOAT3(_options.light_color.data());
-        constant.light_direction = XMFLOAT3(_options.light_direction.data());
-        constant.mip_slice = _options.mip_slice;
+        // Define constants.
+        Constants constants;
+        constants.projection = _camera.GetProjection();
+        constants.view = _camera.GetView();
+        XMStoreFloat4x4(&constants.model, XMMatrixRotationY(XM_PI));
+        constants.normal = XMMatrixInverseTranspose(constants.model);
+        constants.view_direction = _camera.GetForward();
+        constants.light_distance = _options.light_distance;
+        constants.light_position = XMFLOAT3(_options.light_position.data());
+        constants.light_spot_power = _options.light_spot_power;
+        constants.light_color = XMFLOAT3(_options.light_color.data());
+        constants.light_direction = XMFLOAT3(_options.light_direction.data());
+        constants.mip_slice = _options.mip_slice;
 
         // Update transformation.
-        UpdateBuffer(_constant_buffers[index].Get(), &constant, sizeof(Constant));
+        UpdateBuffer(_constant_buffers[index].Get(), &constants, sizeof(Constants));
     }
 
     void OnRender(UINT index) override {
@@ -221,7 +222,7 @@ private:
 
         // Initialize constant buffers.
         for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-            ThrowIfFailed(CreateConstantBuffer(_device.Get(), sizeof(Constant), &_constant_buffers[i]));
+            ThrowIfFailed(CreateConstantBuffer(_device.Get(), sizeof(Constants), &_constant_buffers[i]));
         }
 
         // Initialize a vertex buffer view.

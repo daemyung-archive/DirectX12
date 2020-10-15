@@ -20,7 +20,7 @@ struct Vertex {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-struct Transformation {
+struct Transformations {
     XMFLOAT4X4 projection;
     XMFLOAT4X4 view;
     XMFLOAT4X4 model;
@@ -87,13 +87,13 @@ protected:
         }
 
         // Define transformation.
-        Transformation transformation;
+        Transformations transformation;
         transformation.projection = _camera.GetProjection();
         transformation.view = _camera.GetView();
         transformation.model = kIdentityFloat4x4;
 
         // Update transformation.
-        UpdateBuffer(_constant_buffers[index].Get(), &transformation, sizeof(Transformation));
+        UpdateBuffer(_constant_buffers[index].Get(), &transformation, sizeof(Transformations));
     }
 
     void OnRender(UINT index) override {
@@ -176,7 +176,7 @@ private:
 
         // Initialize constant buffers.
         for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-            ThrowIfFailed(CreateConstantBuffer(_device.Get(), sizeof(Transformation), &_constant_buffers[i]));
+            ThrowIfFailed(CreateConstantBuffer(_device.Get(), sizeof(Transformations), &_constant_buffers[i]));
         }
 
         // Initialize a vertex buffer view.

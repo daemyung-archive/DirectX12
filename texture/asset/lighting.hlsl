@@ -11,7 +11,7 @@ struct Output {
     float3 normal      : NORMAL;
 };
 
-cbuffer Constant : register(b0) {
+cbuffer Constants : register(b0) {
     float4x4 projection;
     float4x4 view;
     float4x4 model;
