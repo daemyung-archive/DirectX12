@@ -266,7 +266,7 @@ private:
 int main(int argc, char *argv[]) {
     try {
         auto example = std::make_unique<Triangle>();
-        Window().MainLoop(example.get());
+        Window::GetInstance()->MainLoop(example.get());
     }
     catch (const std::exception &exception) {
         std::cerr << exception.what() << std::endl;

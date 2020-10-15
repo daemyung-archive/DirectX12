@@ -26,52 +26,47 @@ enum class MouseButton {
 
 class Window {
 public:
-    /// Constructor.
-    Window();
+    //! Retrieve a window.
+    //! \return A window.
+    [[nodiscard]]
+    static Window* GetInstance();
 
-    /// Destructor.
+    //! Destructor.
     ~Window();
 
-    /// Start the main loop.
-    /// \param example An example will be shown on a window.
+    //! Start the main loop.
+    //! \param example An example will be shown on a window.
     void MainLoop(Example *example);
 
     //! Retrieve a window resolution.
     //! \return A resolution of window.
+    [[nodiscard]]
     Resolution GetResolution() const;
 
-    /// Retrieve a instance handle.
-    /// \return A instance handle.
-    [[nodiscard]]
-    inline auto GetInstance() const {
-        return _instance;
-    }
-
-    /// Retrieve a window handle.
-    /// \return A window handle.
+    //! Retrieve a window handle.
+    //! \return A window handle.
     [[nodiscard]]
     inline auto GetWindow() const {
         return _window;
     }
 
 private:
-    /// Initialize an instance handle.
-    void InitInstance();
+    //! Constructor.
+    Window();
 
-    /// Initialize an atom handle.
+    //! Initialize an atom handle.
     void InitAtom();
 
-    /// Terminate an atom handle.
+    //! Terminate an atom handle.
     void TermAtom();
 
-    /// Initialize a window handle.
+    //! Initialize a window handle.
     void InitWindow(const Resolution &resolution);
 
-    /// Terminate a window handle.
+    //! Terminate a window handle.
     void TermWindow();
 
 private:
-    HINSTANCE _instance = nullptr;
     ATOM _atom = 0;
     HWND _window = nullptr;
 };

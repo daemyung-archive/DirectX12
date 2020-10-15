@@ -129,10 +129,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-Window::Window() {
-    InitInstance();
-    InitAtom();
-    InitWindow(kFHDResolution);
+Window *Window::GetInstance() {
+    static std::unique_ptr<Window> window(new Window());
+    return window.get();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -178,9 +177,9 @@ Resolution Window::GetResolution() const {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Window::InitInstance() {
-    // Get an instance.
-    _instance = GetModuleHandle(nullptr);
+Window::Window() {
+    InitAtom();
+    InitWindow(kFHDResolution);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -194,7 +193,7 @@ void Window::InitAtom() {
     window_class.cbSize = sizeof(WNDCLASSEX);
     window_class.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     window_class.lpfnWndProc = WindowProc;
-    window_class.hInstance = _instance;
+    window_class.hInstance = GetModuleHandle(nullptr);
     window_class.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     window_class.hCursor = LoadCursor(nullptr, IDC_ARROW);
     window_class.lpszClassName = class_name.data();
@@ -210,7 +209,7 @@ void Window::InitAtom() {
 
 void Window::TermAtom() {
     // Unregister a window class.
-    UnregisterClass(MAKEINTATOM(_atom), _instance);
+    UnregisterClass(MAKEINTATOM(_atom), GetModuleHandle(nullptr));
     _atom = NULL;
 }
 
@@ -222,7 +221,7 @@ void Window::InitWindow(const Resolution &resolution) {
 
     // Create a window.
     _window = CreateWindow(MAKEINTATOM(_atom), L"DirectX12", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-                           std::get<0>(size), std::get<1>(size), nullptr, nullptr, _instance, nullptr);
+                           std::get<0>(size), std::get<1>(size), nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
     if (!_window) {
         throw std::runtime_error("Fail to create a window.");
     }
