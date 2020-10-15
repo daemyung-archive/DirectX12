@@ -41,6 +41,7 @@ Example::~Example() {
 void Example::BindToWindow(Window *window) {
     InitSwapChain(window);
     InitSwapChainBuffers();
+    InitSwapChainViews();
     InitImGui(window);
 }
 
@@ -75,6 +76,7 @@ void Example::Resize(const Resolution &resolution) {
     _swap_chain->ResizeBuffers(kSwapChainBufferCount, GetWidth(resolution), GetHeight(resolution), kSwapChainFormat,
                                0);
     InitSwapChainBuffers();
+    InitSwapChainViews();
 
     // Resize by an example.
     OnResize(resolution);
@@ -317,6 +319,23 @@ void Example::InitSwapChain(Window *window) {
 void Example::InitSwapChainBuffers() {
     for (auto i = 0; i != kSwapChainBufferCount; ++i) {
         ThrowIfFailed(_swap_chain->GetBuffer(i, IID_PPV_ARGS(&_swap_chain_buffers[i])));
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Example::InitSwapChainViews() {
+    auto descriptor_heap = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Get();
+    auto offset = descriptor_heap->GetDesc().NumDescriptors - kSwapChainBufferCount;
+    auto size = _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
+    CD3DX12_CPU_DESCRIPTOR_HANDLE cpu_handle(descriptor_heap->GetCPUDescriptorHandleForHeapStart());
+    cpu_handle.Offset(offset, size);
+
+    // Initialize swap chain views.
+    for (auto i = 0; i != kSwapChainBufferCount; ++i) {
+        _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, cpu_handle);
+        _swap_chain_views[i] = cpu_handle;
+        cpu_handle.Offset(size);
     }
 }
 

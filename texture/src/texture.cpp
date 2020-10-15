@@ -95,17 +95,6 @@ protected:
         // Update a scissor rect.
         _scissor_rect.right = GetWidth(resolution);
         _scissor_rect.bottom = GetHeight(resolution);
-
-        // Set the first CPU descriptor handle of RTV heap.
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
-                _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart());
-
-        // Initialize swap chain views.
-        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-            _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, rtv);
-            swap_chain_views[i] = rtv;
-            rtv.Offset(_descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]);
-        }
     }
 
     void OnUpdate(UINT index) override {
@@ -159,10 +148,10 @@ protected:
         clear_color[3] = 1.0f;
 
         // Record clearing render target view command.
-        _command_list->ClearRenderTargetView(swap_chain_views[index], clear_color, 0, nullptr);
+        _command_list->ClearRenderTargetView(_swap_chain_views[index], clear_color, 0, nullptr);
 
         // Record commands to draw a triangle.
-        _command_list->OMSetRenderTargets(1, &swap_chain_views[index], true, nullptr);
+        _command_list->OMSetRenderTargets(1, &_swap_chain_views[index], true, nullptr);
         _command_list->RSSetViewports(1, &_viewport);
         _command_list->RSSetScissorRects(1, &_scissor_rect);
         _command_list->SetGraphicsRootSignature(_root_signature.Get());
@@ -326,7 +315,6 @@ private:
     ComPtr<ID3D12PipelineState> _pipeline_state;
     D3D12_VIEWPORT _viewport = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     D3D12_RECT _scissor_rect = {0, 0, 0, 0};
-    D3D12_CPU_DESCRIPTOR_HANDLE swap_chain_views[kSwapChainBufferCount] = {};
 };
 
 //----------------------------------------------------------------------------------------------------------------------

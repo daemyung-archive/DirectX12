@@ -36,14 +36,6 @@ protected:
         // Update a scissor rect.
         _scissor_rect.right = GetWidth(resolution);
         _scissor_rect.bottom = GetHeight(resolution);
-
-        D3D12_CPU_DESCRIPTOR_HANDLE handle;
-
-        handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
-        for (auto i = 0; i != kSwapChainBufferCount; ++i) {
-            _device->CreateRenderTargetView(_swap_chain_buffers[i].Get(), nullptr, handle);
-            handle.ptr += _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
-        }
     }
 
     void OnUpdate(UINT index) override {
@@ -59,13 +51,8 @@ protected:
 
         _command_list->ResourceBarrier(1, &barrier);
 
-        D3D12_CPU_DESCRIPTOR_HANDLE handle;
-
-        handle = _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->GetCPUDescriptorHandleForHeapStart();
-        handle.ptr += _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_RTV] * index;
-
-        _command_list->ClearRenderTargetView(handle, DirectX::Colors::LightSteelBlue, 0, nullptr);
-        _command_list->OMSetRenderTargets(1, &handle, true, nullptr);
+        _command_list->ClearRenderTargetView(_swap_chain_views[index], DirectX::Colors::LightSteelBlue, 0, nullptr);
+        _command_list->OMSetRenderTargets(1, &_swap_chain_views[index], true, nullptr);
         _command_list->RSSetViewports(1, &_viewport);
         _command_list->RSSetScissorRects(1, &_scissor_rect);
 

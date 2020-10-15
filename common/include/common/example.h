@@ -151,8 +151,11 @@ protected:
     //! \param window A window.
     void InitSwapChain(Window *window);
 
-    //! Initialize a swap chain buffer.
+    //! Initialize a swap chain buffers.
     void InitSwapChainBuffers();
+
+    //! Initialize a swap chain views.
+    void InitSwapChainViews();
 
     //! Initialize ImGui.
     //! \param window A window.
@@ -190,6 +193,7 @@ protected:
     UINT _descriptor_heap_sizes[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES] = {};
     ComPtr<IDXGISwapChain3> _swap_chain;
     FrameResource<ID3D12Resource> _swap_chain_buffers;
+    D3D12_CPU_DESCRIPTOR_HANDLE _swap_chain_views[kSwapChainBufferCount] = {};
 };
 
 //----------------------------------------------------------------------------------------------------------------------
