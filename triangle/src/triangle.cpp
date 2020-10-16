@@ -5,7 +5,7 @@
 
 #include <common/window.h>
 #include <common/example.h>
-#include <common/uploader.h>
+#include <common/resource_uploader.h>
 #include <iostream>
 #include <memory>
 
@@ -153,7 +153,7 @@ private:
         UINT16 indices[3] = {0, 1, 2};
 
         if (_options.use_staging_buffer) {
-            Uploader uploader(_device.Get());
+            ResourceUploader uploader(_device.Get());
 
             // Initialize a vertex buffer.
             ThrowIfFailed(CreateDefaultBuffer(_device.Get(), sizeof(vertices), &_vertex_buffer));

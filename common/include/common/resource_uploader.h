@@ -3,8 +3,8 @@
 // See "LICENSE" for license information.
 //
 
-#ifndef UPLOADER_H_
-#define UPLOADER_H_
+#ifndef RESOURCE_UPLOADER_H_
+#define RESOURCE_UPLOADER_H_
 
 #include <wrl.h>
 #include <d3d12.h>
@@ -17,14 +17,14 @@ using Microsoft::WRL::ComPtr;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-class Uploader final {
+class ResourceUploader final {
 public:
     //! Constructor.
     //! \param device A DirectX12 device.
-    explicit Uploader(ID3D12Device4 *device);
+    explicit ResourceUploader(ID3D12Device4 *device);
 
     //! Destructor.
-    ~Uploader();
+    ~ResourceUploader();
 
     //! Record a copy data command.
     //! \param buffer A destination buffer.

@@ -8,7 +8,7 @@
 #include <dds-ktx.h>
 #include <common/window.h>
 #include <common/example.h>
-#include <common/uploader.h>
+#include <common/resource_uploader.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -192,7 +192,7 @@ private:
         // Device indices.
         UINT16 indices[6] = {1, 0, 3, 1, 3, 2};
 
-        Uploader uploader(_device.Get());
+        ResourceUploader uploader(_device.Get());
 
         // Initialize a vertex buffer.
         ThrowIfFailed(CreateDefaultBuffer(_device.Get(), sizeof(vertices), &_vertex_buffer));

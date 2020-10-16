@@ -7,13 +7,13 @@ add_library(common
     STATIC include/common/utility.h
            include/common/window.h
            include/common/example.h
-           include/common/uploader.h
+           include/common/resource_uploader.h
            include/common/timer.h
            include/common/camera.h
                src/utility.cpp
                src/window.cpp
                src/example.cpp
-               src/uploader.cpp
+               src/resource_uploader.cpp
                src/timer.cpp
                src/camera.cpp)
 

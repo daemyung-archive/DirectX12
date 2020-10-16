@@ -3,7 +3,7 @@
 // See "LICENSE" for license information.
 //
 
-#include "uploader.h"
+#include "resource_uploader.h"
 
 #include <d3dx12.h>
 #include <dxgi1_6.h>
@@ -24,7 +24,7 @@ constexpr std::array<D3D12_COMMAND_LIST_TYPE, 2> kCommandTypes = {D3D12_COMMAND_
 
 //----------------------------------------------------------------------------------------------------------------------
 
-Uploader::Uploader(ID3D12Device4 *device)
+ResourceUploader::ResourceUploader(ID3D12Device4 *device)
         : _device(device) {
     InitCommandQueues();
     InitCommandAllocators();
@@ -35,13 +35,13 @@ Uploader::Uploader(ID3D12Device4 *device)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-Uploader::~Uploader() {
+ResourceUploader::~ResourceUploader() {
     TermEvent();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size) {
+void ResourceUploader::RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size) {
     // Create an upload buffer.
     ComPtr<ID3D12Resource> upload_buffer;
     ThrowIfFailed(CreateUploadBuffer(_device, size, &upload_buffer));
@@ -61,7 +61,7 @@ void Uploader::RecordCopyData(ID3D12Resource *buffer, void *data, UINT64 size) {
                                                                       D3D12_RESOURCE_STATE_GENERIC_READ);
 }
 
-void Uploader::RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void *data, UINT64 size) {
+void ResourceUploader::RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void *data, UINT64 size) {
     // Retrieve information to create an upload buffer.
     auto desc = buffer->GetDesc();
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
@@ -92,7 +92,7 @@ void Uploader::RecordCopyData(ID3D12Resource *buffer, UINT mip_slice, const void
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::Execute() {
+void ResourceUploader::Execute() {
     // Record resource barrier commands.
     std::vector<D3D12_RESOURCE_BARRIER> resource_barriers;
     std::transform(std::begin(_resource_barriers), std::end(_resource_barriers), std::back_inserter(resource_barriers),
@@ -127,7 +127,7 @@ void Uploader::Execute() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::InitCommandQueues() {
+void ResourceUploader::InitCommandQueues() {
     for (auto i = 0; i != 2; ++i) {
         D3D12_COMMAND_QUEUE_DESC desc = {};
         desc.Type = kCommandTypes[i];
@@ -139,7 +139,7 @@ void Uploader::InitCommandQueues() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::InitCommandAllocators() {
+void ResourceUploader::InitCommandAllocators() {
     for (auto i = 0; i != 2; ++i) {
         ThrowIfFailed(_device->CreateCommandAllocator(kCommandTypes[i], IID_PPV_ARGS(&_command_allocators[i])));
     }
@@ -148,7 +148,7 @@ void Uploader::InitCommandAllocators() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::InitCommandLists() {
+void ResourceUploader::InitCommandLists() {
     for (auto i = 0; i != 2; ++i) {
         ThrowIfFailed(_device->CreateCommandList(0, kCommandTypes[i], _command_allocators[i].Get(), nullptr,
                                                  IID_PPV_ARGS(&_command_lists[i])));
@@ -157,13 +157,13 @@ void Uploader::InitCommandLists() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::InitFence() {
+void ResourceUploader::InitFence() {
     ThrowIfFailed(_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::InitEvent() {
+void ResourceUploader::InitEvent() {
     _event = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
     if (!_event) {
         throw std::runtime_error("Fail to create an event.");
@@ -172,7 +172,7 @@ void Uploader::InitEvent() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Uploader::TermEvent() {
+void ResourceUploader::TermEvent() {
     CloseHandle(_event);
     _event = nullptr;
 }
