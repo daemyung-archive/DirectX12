@@ -55,6 +55,16 @@ void Camera::SetAspectRatio(float aspect_ratio) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+void Camera::SetRadius(float radius) {
+    if (!XMScalarNearEqual(_radius, radius, FLT_EPSILON)) {
+        _radius = radius;
+        UpdatePosition();
+        UpdateView();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 void Camera::UpdatePosition() {
     if (_mode == CameraMode::kArcball) {
         _position = {_radius * cosf(_theta) * cosf(_phi),

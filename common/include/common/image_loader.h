@@ -39,12 +39,6 @@ public:
     //! \param path A file path.
     //! \return An image.
     Image LoadFile(const std::filesystem::path &path);
-
-private:
-    //! Load an image from DDS or KTX file.
-    //! \param path A file path.
-    //! \return An image.
-    Image LoadDDSKTX(const std::filesystem::path &path);
 };
 
 //----------------------------------------------------------------------------------------------------------------------

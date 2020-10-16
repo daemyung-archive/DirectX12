@@ -369,9 +369,11 @@ void Example::InitImGui(Window *window) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void Example::TermImGui() {
-    ImGui_ImplDX12_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
+    if (ImGui::GetCurrentContext()) {
+        ImGui_ImplDX12_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

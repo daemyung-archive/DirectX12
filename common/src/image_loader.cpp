@@ -4,20 +4,29 @@
 //
 
 #define DDSKTX_IMPLEMENT
+#define STB_IMAGE_IMPLEMENTATION
 
 #include "image_loader.h"
 
 #include <d3dx12.h>
 #include <dds-ktx.h>
+#include <stb_image.h>
 
 #include "utility.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
+//! Cast from the DDSKTX format to the DirectX12 format.
+//! \param format The DDSKTX format.
+//! \return The DirectX12 format.
 auto CastToFormat(ddsktx_format format) {
     switch (format) {
         case DDSKTX_FORMAT_RGBA8:
             return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case DDSKTX_FORMAT_BGRA8:
+            return DXGI_FORMAT_B8G8R8A8_UNORM;
+        case DDSKTX_FORMAT_BC7:
+            return DXGI_FORMAT_BC7_UNORM;
         default:
             throw std::runtime_error("Fail to cast to format.");
     }
@@ -25,19 +34,10 @@ auto CastToFormat(ddsktx_format format) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-Image ImageLoader::LoadFile(const std::filesystem::path &path) {
-    auto extension = path.extension();
-
-    if (extension == ".ktx" || extension == ".dds") {
-        return LoadDDSKTX(path);
-    }
-
-    throw std::runtime_error("");
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-Image ImageLoader::LoadDDSKTX(const std::filesystem::path &path) {
+//! Load an image from DDS or KTX file.
+//! \param path A file path.
+//! \return An image.
+Image LoadDDSKTX(const std::filesystem::path &path) {
     Image image;
 
     // Read pixels from a file.
@@ -75,6 +75,54 @@ Image ImageLoader::LoadDDSKTX(const std::filesystem::path &path) {
     }
 
     return image;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Load an image from STB file.
+//! \param path A file path.
+//! \return An image.
+Image LoadSTB(const std::filesystem::path &path) {
+    Image image;
+
+    // Read pixels from a file.
+    int x, y, channels;
+    auto contents = stbi_load(path.string().c_str(), &x, &y, &channels, STBI_rgb_alpha);
+    auto row_pitch = x * STBI_rgb_alpha;
+    auto size = row_pitch * y;
+
+    image.contents.resize(size);
+    memcpy(image.contents.data(), contents, size);
+    stbi_image_free(contents);
+
+    image.width = x;
+    image.height = y;
+    image.array_size = 1;
+    image.mip_levels = 1;
+    image.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    Subresource subresource;
+    subresource.data = image.contents.data();
+    subresource.row_pitch = row_pitch;
+    subresource.height = y;
+
+    image.subresources.push_back(subresource);
+
+    return image;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Image ImageLoader::LoadFile(const std::filesystem::path &path) {
+    auto extension = path.extension();
+
+    if (extension == ".ktx" || extension == ".dds") {
+        return LoadDDSKTX(path);
+    } else if (extension == ".png") {
+        return LoadSTB(path);
+    }
+
+    throw std::runtime_error("");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

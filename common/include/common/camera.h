@@ -33,6 +33,10 @@ public:
     //! \param aspect_ratio The aspect ratio.
     void SetAspectRatio(float aspect_ratio);
 
+    //! Set the radius
+    //! \param radius The radius.
+    void SetRadius(float radius);
+
     //! Retrieve a forward vector.
     //! \return A forward vector.
     [[nodiscard]]
