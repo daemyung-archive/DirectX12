@@ -38,3 +38,4 @@ cmake ..
 + [fmt](https://github.com/fmtlib/fmt)
 + [Dear ImGui](https://github.com/ocornut/imgui)
 + [dds-ktx](https://github.com/septag/dds-ktx)
++ [stb](https://github.com/nothings/stb)
