@@ -3,12 +3,10 @@
 // See "LICENSE" for license information.
 //
 
-#define DDSKTX_IMPLEMENT
-
-#include <dds-ktx.h>
 #include <common/window.h>
 #include <common/example.h>
 #include <common/resource_uploader.h>
+#include <common/image_loader.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -202,20 +200,16 @@ private:
         ThrowIfFailed(CreateDefaultBuffer(_device.Get(), sizeof(indices), &_index_buffer));
         uploader.RecordCopyData(_index_buffer.Get(), indices, sizeof(indices));
 
-        // Read a ktx file.
-        auto contents = ReadFile(BuildFilePath("metalplate01_rgba.ktx"));
-        assert(contents.size());
+        // Read an image.
+        ImageLoader image_loader;
+        auto image = image_loader.LoadFile(BuildFilePath("metalplate01_rgba.ktx"));
 
         // Initialize a texture.
-        ddsktx_texture_info texture_info;
-        if (ddsktx_parse(&texture_info, contents.data(), static_cast<INT>(contents.size()), nullptr)) {
-            ThrowIfFailed(CreateDefaultTexture2D(_device.Get(), texture_info.width, texture_info.height,
-                                                 texture_info.num_mips, DXGI_FORMAT_R8G8B8A8_UNORM, &_texture));
-            for (auto i = 0; i != texture_info.num_mips; ++i) {
-                ddsktx_sub_data sub_data;
-                ddsktx_get_sub(&texture_info, &sub_data, contents.data(), static_cast<INT>(contents.size()), 0, 0, i);
-                uploader.RecordCopyData(_texture.Get(), i, sub_data.buff, sub_data.row_pitch_bytes * sub_data.height);
-            }
+        ThrowIfFailed(CreateDefaultTexture2D(_device.Get(), image.width, image.height,
+                                             image.mip_levels, image.format, &_texture));
+        for (auto i = 0; i != image.mip_levels; ++i) {
+            auto &subresource = image.subresources[i];
+            uploader.RecordCopyData(_texture.Get(), i, subresource.data, subresource.row_pitch * subresource.height);
         }
 
         uploader.Execute();

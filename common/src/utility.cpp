@@ -42,6 +42,9 @@ std::string ConvertUTF16ToUTF8(wchar_t *utf16) {
 
 std::vector<BYTE> ReadFile(const std::filesystem::path &path) {
     std::basic_ifstream<BYTE> fin(path, std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        throw std::runtime_error(fmt::format("Fail to open {}.", path.string()));
+    }
     return std::vector<BYTE>(std::istreambuf_iterator<BYTE>(fin), std::istreambuf_iterator<BYTE>());
 }
 
