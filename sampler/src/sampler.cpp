@@ -7,7 +7,6 @@
 #include <common/example.h>
 #include <common/resource_uploader.h>
 #include <common/image_loader.h>
-#include <iostream>
 #include <memory>
 #include <vector>
 #include <array>
@@ -408,7 +407,7 @@ int main(int argc, char *argv[]) {
         Window::GetInstance()->MainLoop(example.get());
     }
     catch (const std::exception &exception) {
-        std::cerr << exception.what() << std::endl;
+        OutputDebugStringA(exception.what());
     }
     return 0;
 }

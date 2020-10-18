@@ -5,7 +5,6 @@
 
 #include <common/window.h>
 #include <common/example.h>
-#include <iostream>
 #include <memory>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,7 +76,7 @@ int main(int argc, char *argv[]) {
         Window::GetInstance()->MainLoop(example.get());
     }
     catch (const std::exception &exception) {
-        std::cerr << exception.what() << std::endl;
+        OutputDebugStringA(exception.what());
     }
     return 0;
 }

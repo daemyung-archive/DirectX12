@@ -6,7 +6,6 @@
 #include <common/window.h>
 #include <common/example.h>
 #include <common/resource_uploader.h>
-#include <iostream>
 #include <memory>
 
 using namespace DirectX;
@@ -257,7 +256,7 @@ int main(int argc, char *argv[]) {
         Window::GetInstance()->MainLoop(example.get());
     }
     catch (const std::exception &exception) {
-        std::cerr << exception.what() << std::endl;
+        OutputDebugStringA(exception.what());
     }
     return 0;
 }

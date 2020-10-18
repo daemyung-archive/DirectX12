@@ -7,7 +7,6 @@
 
 #include <d3dx12.h>
 #include <d3dcompiler.h>
-#include <iostream>
 #include <fstream>
 
 #ifdef __clang__
@@ -69,7 +68,7 @@ HRESULT CompileShader(const std::filesystem::path &file_path, const D3D_SHADER_M
     auto result = D3DCompileFromFile(file_path.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypoint.c_str(),
                                      target.c_str(), flags, 0, code, &error);
     if (error) {
-        std::cerr << static_cast<char *>(error->GetBufferPointer()) << std::endl;
+        OutputDebugStringA(static_cast<char *>(error->GetBufferPointer()));
     }
 
     return result;
@@ -81,7 +80,7 @@ HRESULT SerializeRootSignature(const D3D12_ROOT_SIGNATURE_DESC *desc, ID3DBlob *
     ComPtr<ID3DBlob> error;
     auto result = D3D12SerializeRootSignature(desc, D3D_ROOT_SIGNATURE_VERSION_1, blob, &error);
     if (error) {
-        std::cerr << static_cast<char *>(error->GetBufferPointer()) << std::endl;
+        OutputDebugStringA(static_cast<char *>(error->GetBufferPointer()));
     }
 
     return result;
