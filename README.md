@@ -42,3 +42,4 @@ cmake ..
 + [dds-ktx](https://github.com/septag/dds-ktx)
 + [stb](https://github.com/nothings/stb)
 + [JSON for Modern C++](https://github.com/nlohmann/json)
++ [fx-gltf](https://github.com/jessey-git/fx-gltf)
