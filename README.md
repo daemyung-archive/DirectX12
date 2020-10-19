@@ -41,3 +41,4 @@ cmake ..
 + [Dear ImGui](https://github.com/ocornut/imgui)
 + [dds-ktx](https://github.com/septag/dds-ktx)
 + [stb](https://github.com/nothings/stb)
++ [JSON for Modern C++](https://github.com/nlohmann/json)

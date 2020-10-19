@@ -15,6 +15,7 @@ add_library(external
            include/fmt/core.h
            include/fmt/format.h
            include/fmt/format-inl.h
+           include/nlohmann/json.hpp
                src/imgui_internal.h
                src/imstb_truetype.h
                src/imstb_textedit.h
