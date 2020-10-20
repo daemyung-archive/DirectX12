@@ -898,7 +898,7 @@ static inline int ddsktx__read(ddsktx__mem_reader* reader, void* buff, int size)
 
 static bool ddsktx__parse_ktx(ddsktx_texture_info* tc, const void* file_data, int size, ddsktx_error* err)
 {
-    static const uint8_t ktx__id[] = { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
+    static const uint8_t ktx__id[] = { 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
 
     ddsktx_memset(tc, 0x0, sizeof(ddsktx_texture_info));
 
@@ -907,8 +907,8 @@ static bool ddsktx__parse_ktx(ddsktx_texture_info* tc, const void* file_data, in
     if (ddsktx__read(&r, &header, sizeof(header)) != DDSKTX__KTX_HEADER_SIZE) {
         ddsktx__err(err, "ktx; header size does not match");
     }
-    
-    if (ddsktx_memcmp(header.id, ktx__id, sizeof(header.id)) == 0) {
+
+    if (ddsktx_memcmp(header.id, ktx__id, sizeof(header.id)) != 0) {
         ddsktx__err(err, "ktx: invalid file header");
     }
 
