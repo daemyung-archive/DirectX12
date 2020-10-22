@@ -250,7 +250,7 @@ protected:
         _command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         _command_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-        RecordDrawImGuiCommands();
+        RecordDrawImGuiCommands(_command_list.Get());
 
         // Define a transition of a resource from RENDER_TARGET to PRESENT.
         resource_barrier = CD3DX12_RESOURCE_BARRIER::Transition(_swap_chain_buffers[index].Get(),

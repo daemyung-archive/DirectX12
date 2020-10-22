@@ -89,7 +89,8 @@ public:
 
 protected:
     //! Record draw commands for ImGui.
-    void RecordDrawImGuiCommands();
+    //! \param command_list A command list which can record commands.
+    void RecordDrawImGuiCommands(ID3D12GraphicsCommandList* command_list);
 
     //! Wait until a command queue is idle.
     void WaitCommandQueueIdle();
@@ -181,7 +182,7 @@ protected:
     ComPtr<IDXGIFactory7> _factory;
     ComPtr<IDXGIAdapter4> _adapter;
     DXGI_ADAPTER_DESC3 _adapter_desc;
-    ComPtr<ID3D12Device4> _device;
+    ComPtr<ID3D12Device5> _device;
     ComPtr<ID3D12CommandQueue> _command_queue;
     FrameResource<ID3D12CommandAllocator> _command_allocators;
     ComPtr<ID3D12GraphicsCommandList4> _command_list;

@@ -55,7 +55,7 @@ protected:
         _command_list->RSSetViewports(1, &_viewport);
         _command_list->RSSetScissorRects(1, &_scissor_rect);
 
-        RecordDrawImGuiCommands();
+        RecordDrawImGuiCommands(_command_list.Get());
 
         barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
         barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

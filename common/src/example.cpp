@@ -166,11 +166,11 @@ void Example::OnMouseWheel(float delta) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void Example::RecordDrawImGuiCommands() {
+void Example::RecordDrawImGuiCommands(ID3D12GraphicsCommandList* command_list) {
     std::vector<ID3D12DescriptorHeap *> descriptor_heaps = {
             _descriptor_heaps[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Get()};
-    _command_list->SetDescriptorHeaps(static_cast<UINT>(descriptor_heaps.size()), descriptor_heaps.data());
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), _command_list.Get());
+    command_list->SetDescriptorHeaps(static_cast<UINT>(descriptor_heaps.size()), descriptor_heaps.data());
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), command_list);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
