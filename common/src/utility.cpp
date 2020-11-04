@@ -30,11 +30,20 @@ inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UIN
 
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string ConvertUTF16ToUTF8(wchar_t *utf16) {
+std::string ConvertUTF16ToUTF8(const wchar_t *utf16) {
     auto size = WideCharToMultiByte(CP_ACP, 0, utf16, -1, nullptr, 0, nullptr, nullptr);
     std::string utf8(size, ' ');
     WideCharToMultiByte(CP_ACP, 0, utf16, -1, utf8.data(), size, nullptr, nullptr);
     return utf8;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+std::wstring ConvertUTF8ToUTF16(const char* utf8) {
+    auto size = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, nullptr, 0);
+    std::wstring utf16(size, ' ');
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, utf16.data(), size);
+    return utf16;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,6 +150,7 @@ HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, 
     desc.MipLevels = mip_levels;
     desc.Format = format;
     desc.SampleDesc = {1, 0};
+    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
     return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
                                            &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(buffer));

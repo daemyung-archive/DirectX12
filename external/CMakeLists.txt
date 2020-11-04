@@ -17,6 +17,8 @@ add_library(external
            include/fmt/format-inl.h
            include/nlohmann/json.hpp
            include/fx/gltf.h
+           include/dxcapi.h
+           include/d3d12shader.h
                src/imgui_internal.h
                src/imstb_truetype.h
                src/imstb_textedit.h
@@ -31,3 +33,6 @@ add_library(external
 
 target_include_directories(external
     PUBLIC include)
+
+target_compile_definitions(external
+        PUBLIC EXTERNAL_LIBRARY_DIR="${CMAKE_CURRENT_SOURCE_DIR}/lib")

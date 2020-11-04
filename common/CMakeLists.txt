@@ -11,13 +11,15 @@ add_library(common
            include/common/timer.h
            include/common/camera.h
            include/common/image_loader.h
+           include/common/compiler.h
                src/utility.cpp
                src/window.cpp
                src/example.cpp
                src/resource_uploader.cpp
                src/timer.cpp
                src/camera.cpp
-               src/image_loader.cpp)
+               src/image_loader.cpp
+               src/compiler.cpp)
 
 target_include_directories(common
     PUBLIC  include
@@ -33,7 +35,7 @@ target_compile_definitions(common
 
 target_link_libraries(common
     PUBLIC external
-           dxguid.lib
-           dxgi.lib
-           d3dcompiler.lib
-           d3d12.lib)
+           dxguid
+           dxgi
+           d3dcompiler
+           d3d12)

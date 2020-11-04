@@ -25,6 +25,6 @@ Output VSMain(Input input) {
 
 float4 PSMain(Output input) : SV_Target {
     float4 color;
-    color = float4(input.color, 1.0);;
+    color = float4(input.color, 1.0);
     return color;
 }

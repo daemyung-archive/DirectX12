@@ -19,6 +19,7 @@
 #include "window.h"
 #include "timer.h"
 #include "camera.h"
+#include "compiler.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -177,6 +178,7 @@ protected:
     UINT _cps = 0;
     UINT _fps = 0;
     Duration _fps_time = Duration::zero();
+    Compiler _compiler;
     Camera _camera;
     POINT _mouse_position = {0, 0};
     ComPtr<IDXGIFactory7> _factory;

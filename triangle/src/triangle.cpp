@@ -207,12 +207,14 @@ private:
         ThrowIfFailed(CreateRootSignature(_device.Get(), &root_signature_desc, &_root_signature));
 
         // Compile a vertex shader.
-        ComPtr<ID3DBlob> vertex_shader;
-        ThrowIfFailed(CompileShader(BuildFilePath("pass_through.hlsl"), "VSMain", "vs_5_0", &vertex_shader));
+        ComPtr<IDxcBlob> vertex_shader;
+        ThrowIfFailed(_compiler.CompileShader(BuildFilePath("pass_through.hlsl"), L"VSMain", L"vs_6_0",
+                                              &vertex_shader));
 
         // Compile a pixel shader.
-        ComPtr<ID3DBlob> pixel_shader;
-        ThrowIfFailed(CompileShader(BuildFilePath("pass_through.hlsl"), "PSMain", "ps_5_0", &pixel_shader));
+        ComPtr<IDxcBlob> pixel_shader;
+        ThrowIfFailed(_compiler.CompileShader(BuildFilePath("pass_through.hlsl"), L"PSMain", L"ps_6_0",
+                                              &pixel_shader));
 
         // Define a graphics pipeline state.
         D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};

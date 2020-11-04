@@ -73,7 +73,14 @@ T AlignPow2(T value, UINT64 alignment) {
 //! Convert from UTF16 to UTF8.
 //! \param utf16 A UTF16 string.
 //! \return A UTF8 string.
-extern std::string ConvertUTF16ToUTF8(wchar_t *utf16);
+extern std::string ConvertUTF16ToUTF8(const wchar_t *utf16);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Convert from UTF8 to UTF16.
+//! \param utf8 A UTF8 string.
+//! \return A UTF16 string.
+extern std::wstring ConvertUTF8ToUTF16(const char* utf8);
 
 //----------------------------------------------------------------------------------------------------------------------
 
