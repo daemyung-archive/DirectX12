@@ -198,9 +198,16 @@ extern HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT h
 
 //----------------------------------------------------------------------------------------------------------------------
 
+//! Calculate the inverse matrix.
+//! \param float4x4 A matrix for calculating the inverse matrix.
+//! \return An inverse matrix.
+extern DirectX::XMFLOAT4X4 XMMatrixInverse(const DirectX::XMFLOAT4X4 &float4x4);
+
+//----------------------------------------------------------------------------------------------------------------------
+
 //! Calculate the inverse transpose matrix.
 //! \param float4x4 A matrix for calculating the inverse transpose matrix.
-//! \return A inverse transpose matrix.
+//! \return An inverse transpose matrix.
 extern DirectX::XMFLOAT3X4 XMMatrixInverseTranspose(const DirectX::XMFLOAT4X4 &float4x4);
 
 //----------------------------------------------------------------------------------------------------------------------

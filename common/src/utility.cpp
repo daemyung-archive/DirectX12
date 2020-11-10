@@ -158,6 +158,21 @@ HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+DirectX::XMFLOAT4X4 XMMatrixInverse(const DirectX::XMFLOAT4X4 &float4x4) {
+    XMMATRIX matrix = XMMatrixSet(float4x4._11, float4x4._12, float4x4._13, float4x4._14,
+                                  float4x4._21, float4x4._22, float4x4._23, float4x4._24,
+                                  float4x4._31, float4x4._32, float4x4._33, float4x4._34,
+                                  float4x4._41, float4x4._42, float4x4._43, float4x4._44);
+    XMVECTOR determinant = XMMatrixDeterminant(matrix);
+    matrix = XMMatrixInverse(&determinant, matrix);
+
+    XMFLOAT4X4 result;
+    XMStoreFloat4x4(&result, matrix);
+    return result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 DirectX::XMFLOAT3X4 XMMatrixInverseTranspose(const DirectX::XMFLOAT4X4 &float4x4) {
     XMMATRIX matrix = XMMatrixSet(float4x4._11, float4x4._12, float4x4._13, float4x4._14,
                                   float4x4._21, float4x4._22, float4x4._23, float4x4._24,
@@ -166,9 +181,9 @@ DirectX::XMFLOAT3X4 XMMatrixInverseTranspose(const DirectX::XMFLOAT4X4 &float4x4
     XMVECTOR determinant = XMMatrixDeterminant(matrix);
     matrix = XMMatrixTranspose(XMMatrixInverse(&determinant, matrix));
 
-    XMFLOAT3X4 float3x4;
-    XMStoreFloat3x4(&float3x4, matrix);
-    return float3x4;
+    XMFLOAT3X4 result;
+    XMStoreFloat3x4(&result, matrix);
+    return result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
