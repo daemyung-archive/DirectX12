@@ -51,11 +51,25 @@ public:
         return _projection;
     }
 
+    //! Retrieve an inverse projection matrix.
+    //! \return An inverse projection matrix.
+    [[nodiscard]]
+    inline auto GetInverseProjection() const {
+        return XMMatrixInverse(_projection);
+    }
+
     //! Retrieve a view matrix.
     //! \return A view matrix.
     [[nodiscard]]
     inline auto GetView() const {
         return _view;
+    }
+
+    //! Retrieve an inverse view matrix.
+    //! \return An inverse view matrix.
+    [[nodiscard]]
+    inline auto GetInverseView() const {
+        return XMMatrixInverse(_view);
     }
 
 private:

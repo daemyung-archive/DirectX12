@@ -158,6 +158,18 @@ extern HRESULT CreateDefaultBuffer(ID3D12Device *device, UINT64 size, ID3D12Reso
 
 //----------------------------------------------------------------------------------------------------------------------
 
+//! Create a buffer which has the default heap.
+//! \param device A DirectX12 device.
+//! \param size The byte size of a buffer.
+//! \param buffer A pointer to a memory block that receives a pointer to ID3D12Resource.
+//! \param flags The resource flags.
+//! \param resource_state The initial state of the resource.
+//! \return A result.
+extern HRESULT CreateDefaultBuffer(ID3D12Device *device, UINT64 size, D3D12_RESOURCE_FLAGS flags,
+                                   D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer);
+
+//----------------------------------------------------------------------------------------------------------------------
+
 //! Create a buffer which has the upload heap.
 //! \param device A DirectX12 device.
 //! \param size The byte size of a buffer.
@@ -195,6 +207,21 @@ extern HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Res
 //! \return A result.
 extern HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
                                       DXGI_FORMAT format, ID3D12Resource **buffer);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Create a default texture 2D.
+//! \param device A DirectX12 device.
+//! \param width The width of a texture.
+//! \param height The height of a texture.
+//! \param mip_levels The mip levels of a texture.
+//! \param format The texture format.
+//! \param buffer A pointer to a memory block that receives a pointer to ID3D12Resource.
+//! \param resource_state The initial state of the resource.
+//! \return A result.
+extern HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
+                                      DXGI_FORMAT format, D3D12_RESOURCE_STATES resource_state,
+                                      ID3D12Resource **buffer);
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -21,11 +21,22 @@ using Microsoft::WRL::ComPtr;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 size,
+inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 size, D3D12_RESOURCE_FLAGS flags,
                             D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
     return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
-                                           &CD3DX12_RESOURCE_DESC::Buffer(size), resource_state,
+                                           &CD3DX12_RESOURCE_DESC::Buffer(size, flags), resource_state,
                                            nullptr, IID_PPV_ARGS(buffer));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+inline HRESULT CreateTexture2D(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 width, UINT height,
+                               UINT16 mip_levels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags,
+                               D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
+    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
+                                           &CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, mip_levels,
+                                                                         1, 0, flags),
+                                           resource_state, nullptr, IID_PPV_ARGS(buffer));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -39,7 +50,7 @@ std::string ConvertUTF16ToUTF8(const wchar_t *utf16) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-std::wstring ConvertUTF8ToUTF16(const char* utf8) {
+std::wstring ConvertUTF8ToUTF16(const char *utf8) {
     auto size = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, nullptr, 0);
     std::wstring utf16(size, ' ');
     MultiByteToWideChar(CP_UTF8, 0, utf8, -1, utf16.data(), size);
@@ -112,13 +123,22 @@ HRESULT CreateRootSignature(ID3D12Device *device, const D3D12_ROOT_SIGNATURE_DES
 //----------------------------------------------------------------------------------------------------------------------
 
 HRESULT CreateDefaultBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer) {
-    return CreateBuffer(device, D3D12_HEAP_TYPE_DEFAULT, size, D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+    return CreateBuffer(device, D3D12_HEAP_TYPE_DEFAULT, size, D3D12_RESOURCE_FLAG_NONE,
+                        D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+HRESULT CreateDefaultBuffer(ID3D12Device *device, UINT64 size, D3D12_RESOURCE_FLAGS flags,
+                            D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
+    return CreateBuffer(device, D3D12_HEAP_TYPE_DEFAULT, size, flags, resource_state, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 HRESULT CreateUploadBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer) {
-    return CreateBuffer(device, D3D12_HEAP_TYPE_UPLOAD, size, D3D12_RESOURCE_STATE_GENERIC_READ, buffer);
+    return CreateBuffer(device, D3D12_HEAP_TYPE_UPLOAD, size, D3D12_RESOURCE_FLAG_NONE,
+                        D3D12_RESOURCE_STATE_GENERIC_READ, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -134,7 +154,7 @@ void UpdateBuffer(ID3D12Resource *buffer, void *data, UINT64 size) {
 
 HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource **buffer) {
     return CreateBuffer(device, D3D12_HEAP_TYPE_UPLOAD,
-                        AlignPow2(size, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT),
+                        AlignPow2(size, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT), D3D12_RESOURCE_FLAG_NONE,
                         D3D12_RESOURCE_STATE_GENERIC_READ, buffer);
 }
 
@@ -142,18 +162,19 @@ HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource *
 
 HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
                                DXGI_FORMAT format, ID3D12Resource **buffer) {
-    D3D12_RESOURCE_DESC desc = {};
-    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    desc.Width = width;
-    desc.Height = height;
-    desc.DepthOrArraySize = 1;
-    desc.MipLevels = mip_levels;
-    desc.Format = format;
-    desc.SampleDesc = {1, 0};
-    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+    return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
+                           D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                           D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+}
 
-    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-                                           &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(buffer));
+//----------------------------------------------------------------------------------------------------------------------
+
+HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
+                               DXGI_FORMAT format, D3D12_RESOURCE_STATES resource_state,
+                               ID3D12Resource **buffer) {
+    return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
+                           D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
+                           resource_state, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
