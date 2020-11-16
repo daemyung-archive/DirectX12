@@ -19,6 +19,14 @@ add_library(external
            include/fx/gltf.h
            include/dxcapi.h
            include/d3d12shader.h
+           include/gml/gml.hpp
+           include/gml/intersect.hpp
+           include/gml/mat.hpp
+           include/gml/quaternion.hpp
+           include/gml/spline.hpp
+           include/gml/texture.hpp
+           include/gml/util.hpp
+           include/gml/vec.hpp
                src/imgui_internal.h
                src/imstb_truetype.h
                src/imstb_textedit.h
