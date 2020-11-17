@@ -36,7 +36,7 @@ Triangle ConvexPolygonMesh::Triangles::generate() const {
 
 	Triangle triangle{};
 
-	const int verticesPerRing = mMesh->mSegments * mMesh->mVertices.size();
+	const int verticesPerRing = mMesh->mSegments * static_cast<int>(mMesh->mVertices.size());
 	const int delta = mRingIndex * verticesPerRing + 1;
 
 	const int n1 = mSideIndex * mMesh->mSegments + mSegmentIndex;
