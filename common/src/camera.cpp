@@ -35,7 +35,8 @@ void Camera::RotateBy(const DirectX::XMFLOAT2 &delta) {
     if (abs(delta.x) > FLT_EPSILON || abs(delta.y) > FLT_EPSILON) {
         if (_mode == CameraMode::kArcball) {
             _phi -= XMConvertToRadians(delta.x);
-            _theta = std::clamp(_theta + XMConvertToRadians(delta.y), -XM_PIDIV2, XM_PIDIV2);
+            _theta = std::clamp(_theta + XMConvertToRadians(delta.y),
+                                -XM_PIDIV2 + FLT_EPSILON, XM_PIDIV2 - FLT_EPSILON);
             UpdatePosition();
             UpdateView();
         } else {
