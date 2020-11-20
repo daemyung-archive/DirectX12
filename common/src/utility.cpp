@@ -23,8 +23,9 @@ using Microsoft::WRL::ComPtr;
 
 inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 size, D3D12_RESOURCE_FLAGS flags,
                             D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
-    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
-                                           &CD3DX12_RESOURCE_DESC::Buffer(size, flags), resource_state,
+    auto heap_properties = CD3DX12_HEAP_PROPERTIES(heap_type);
+    auto desc = CD3DX12_RESOURCE_DESC::Buffer(size, flags);
+    return device->CreateCommittedResource(&heap_properties, D3D12_HEAP_FLAG_NONE, &desc, resource_state,
                                            nullptr, IID_PPV_ARGS(buffer));
 }
 
@@ -33,10 +34,10 @@ inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UIN
 inline HRESULT CreateTexture2D(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 width, UINT height,
                                UINT16 mip_levels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags,
                                D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
-    return device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(heap_type), D3D12_HEAP_FLAG_NONE,
-                                           &CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, mip_levels,
-                                                                         1, 0, flags),
-                                           resource_state, nullptr, IID_PPV_ARGS(buffer));
+    auto heap_properties = CD3DX12_HEAP_PROPERTIES(heap_type);
+    auto desc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, mip_levels, 1, 0, flags);
+    return device->CreateCommittedResource(&heap_properties, D3D12_HEAP_FLAG_NONE, &desc, resource_state,
+                                           nullptr, IID_PPV_ARGS(buffer));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,7 +188,7 @@ DirectX::XMFLOAT4X4 XMMatrixInverse(const DirectX::XMFLOAT4X4 &float4x4) {
     XMVECTOR determinant = XMMatrixDeterminant(matrix);
     matrix = XMMatrixInverse(&determinant, matrix);
 
-    XMFLOAT4X4 result;
+    XMFLOAT4X4 result = {};
     XMStoreFloat4x4(&result, matrix);
     return result;
 }
@@ -202,7 +203,7 @@ DirectX::XMFLOAT3X4 XMMatrixInverseTranspose(const DirectX::XMFLOAT4X4 &float4x4
     XMVECTOR determinant = XMMatrixDeterminant(matrix);
     matrix = XMMatrixTranspose(XMMatrixInverse(&determinant, matrix));
 
-    XMFLOAT3X4 result;
+    XMFLOAT3X4 result = {};
     XMStoreFloat3x4(&result, matrix);
     return result;
 }

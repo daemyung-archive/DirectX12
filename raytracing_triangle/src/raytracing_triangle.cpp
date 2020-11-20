@@ -285,8 +285,11 @@ private:
         // Record a build raytracing bottom level acceleration structure command.
         command_list->BuildRaytracingAccelerationStructure(&blas_desc, 0, nullptr);
 
+        D3D12_RESOURCE_BARRIER barrier = {};
+
         // Record a barrier.
-        command_list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::UAV(blas_buffers.result.Get()));
+        barrier = CD3DX12_RESOURCE_BARRIER::UAV(blas_buffers.result.Get());
+        command_list->ResourceBarrier(1, &barrier);
         _blas_buffer = blas_buffers.result;
 
         // Define a raytracing instance.
@@ -337,7 +340,8 @@ private:
         command_list->BuildRaytracingAccelerationStructure(&tlas_desc, 0, nullptr);
 
         // Record a barrier.
-        command_list->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::UAV(tlas_buffers.result.Get()));
+        barrier = CD3DX12_RESOURCE_BARRIER::UAV(blas_buffers.result.Get());
+        command_list->ResourceBarrier(1, &barrier);
         _tlas_buffer = tlas_buffers.result;
 
         // Stop recording a command list.
