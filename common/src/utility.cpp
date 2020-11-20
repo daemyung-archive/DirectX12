@@ -164,18 +164,24 @@ HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource *
 HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
                                DXGI_FORMAT format, ID3D12Resource **buffer) {
     return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
-                           D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-                           D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+                           D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
-                               DXGI_FORMAT format, D3D12_RESOURCE_STATES resource_state,
-                               ID3D12Resource **buffer) {
+                               DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags, ID3D12Resource **buffer) {
     return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
-                           D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS,
-                           resource_state, buffer);
+                           flags, D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
+                               DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags,
+                               D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
+    return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
+                           flags, resource_state, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
