@@ -9,6 +9,16 @@ using namespace DirectX;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#ifdef near
+#undef near
+#endif
+
+#ifdef far
+#undef far
+#endif
+
+//----------------------------------------------------------------------------------------------------------------------
+
 Camera::Camera() {
     UpdatePosition();
     UpdateView();
@@ -42,6 +52,24 @@ void Camera::RotateBy(const DirectX::XMFLOAT2 &delta) {
         } else {
             assert(false);
         }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetNear(float near) {
+    if (!XMScalarNearEqual(_near, near, FLT_EPSILON)) {
+        _near = near;
+        UpdateProjection();
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetFar(float far) {
+    if (!XMScalarNearEqual(_far, far, FLT_EPSILON)) {
+        _far = far;
+        UpdateProjection();
     }
 }
 

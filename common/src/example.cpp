@@ -274,7 +274,7 @@ void Example::InitDescriptorHeaps(const std::unordered_map<D3D12_DESCRIPTOR_HEAP
         desc.Type = type;
         desc.NumDescriptors = count;
 
-        if (type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV) {
+        if (type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV && type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV) {
             desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         }
 

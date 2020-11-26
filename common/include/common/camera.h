@@ -29,6 +29,14 @@ public:
     //! \param delta The delta how much rotate.
     void RotateBy(const DirectX::XMFLOAT2 &delta);
 
+    //! Set the camera z near.
+    //! \param near The z near.
+    void SetNear(float near);
+
+    //! Set the camera z far.
+    //! \param far The z far.
+    void SetFar(float far);
+
     //! Set the aspect ratio.
     //! \param aspect_ratio The aspect ratio.
     void SetAspectRatio(float aspect_ratio);
@@ -96,7 +104,6 @@ private:
     DirectX::XMFLOAT3 _forward = kZeroFloat3;
     DirectX::XMFLOAT4X4 _projection = kIdentityFloat4x4;
     DirectX::XMFLOAT4X4 _view = kIdentityFloat4x4;
-
 };
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -33,11 +33,12 @@ inline HRESULT CreateBuffer(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UIN
 
 inline HRESULT CreateTexture2D(ID3D12Device *device, D3D12_HEAP_TYPE heap_type, UINT64 width, UINT height,
                                UINT16 mip_levels, DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags,
-                               D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
+                               D3D12_RESOURCE_STATES resource_state, const D3D12_CLEAR_VALUE *clear_value,
+                               ID3D12Resource **buffer) {
     auto heap_properties = CD3DX12_HEAP_PROPERTIES(heap_type);
     auto desc = CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, mip_levels, 1, 0, flags);
     return device->CreateCommittedResource(&heap_properties, D3D12_HEAP_FLAG_NONE, &desc, resource_state,
-                                           nullptr, IID_PPV_ARGS(buffer));
+                                           clear_value, IID_PPV_ARGS(buffer));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -164,7 +165,7 @@ HRESULT CreateConstantBuffer(ID3D12Device *device, UINT64 size, ID3D12Resource *
 HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
                                DXGI_FORMAT format, ID3D12Resource **buffer) {
     return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
-                           D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+                           D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -172,7 +173,7 @@ HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, 
 HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
                                DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags, ID3D12Resource **buffer) {
     return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
-                           flags, D3D12_RESOURCE_STATE_COPY_DEST, buffer);
+                           flags, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -181,7 +182,17 @@ HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, 
                                DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags,
                                D3D12_RESOURCE_STATES resource_state, ID3D12Resource **buffer) {
     return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
-                           flags, resource_state, buffer);
+                           flags, resource_state, nullptr, buffer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+HRESULT CreateDefaultTexture2D(ID3D12Device *device, UINT64 width, UINT height, UINT16 mip_levels,
+                               DXGI_FORMAT format, D3D12_RESOURCE_FLAGS flags,
+                               D3D12_RESOURCE_STATES resource_state, const D3D12_CLEAR_VALUE *clear_value,
+                               ID3D12Resource **buffer) {
+    return CreateTexture2D(device, D3D12_HEAP_TYPE_DEFAULT, width, height, mip_levels, format,
+                           flags, resource_state, clear_value, buffer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

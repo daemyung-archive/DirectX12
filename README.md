@@ -10,6 +10,7 @@ A comprehensive collection of open source C++ examples for DirectX12, the new ge
     + [Triangle](https://github.com/daemyung/DirectX12/tree/master/triangle)
     + [Texture](https://github.com/daemyung/DirectX12/tree/master/texture)
     + [Sampler](https://github.com/daemyung/DirectX12/tree/master/sampler)
+    + [Depth test](https://github.com/daemyung/DirectX12/tree/master/depth_test)
     + [Raytracing triangle](https://github.com/daemyung/DirectX12/tree/master/raytracing_triangle)
 + [Open sources](#open-sources)
 
@@ -35,6 +36,7 @@ cmake ..
 + [Triangle](https://github.com/daemyung/DirectX12/tree/master/triangle)
 + [Texture](https://github.com/daemyung/DirectX12/tree/master/texture)
 + [Sampler](https://github.com/daemyung/DirectX12/tree/master/sampler)
++ [Depth test](https://github.com/daemyung/DirectX12/tree/master/depth_test)
 + [Raytracing triangle](https://github.com/daemyung/DirectX12/tree/master/raytracing_triangle)
 
 ## Open sources
