@@ -9,6 +9,8 @@
 #include <d3dcompiler.h>
 #include <fstream>
 
+#include "file_system.h"
+
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Waddress-of-temporary"
@@ -61,16 +63,6 @@ std::wstring ConvertUTF8ToUTF16(const char *utf8) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-std::vector<BYTE> ReadFile(const std::filesystem::path &path) {
-    std::basic_ifstream<BYTE> fin(path, std::ios::in | std::ios::binary);
-    if (!fin.is_open()) {
-        throw std::runtime_error(fmt::format("Fail to open {}.", path.string()));
-    }
-    return std::vector<BYTE>(std::istreambuf_iterator<BYTE>(fin), std::istreambuf_iterator<BYTE>());
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 HRESULT CompileShader(const std::filesystem::path &file_path, const std::string &entrypoint,
                       const std::string &target, ID3DBlob **code) {
     return CompileShader(file_path, nullptr, entrypoint, target, code);
@@ -80,6 +72,7 @@ HRESULT CompileShader(const std::filesystem::path &file_path, const std::string 
 
 HRESULT CompileShader(const std::filesystem::path &file_path, const D3D_SHADER_MACRO *defines,
                       const std::string &entrypoint, const std::string &target, ID3DBlob **code) {
+    auto source = FileSystem::GetInstance()->ReadFile(file_path);
     UINT flags = 0;
 
 #ifdef _DEBUG
@@ -87,8 +80,9 @@ HRESULT CompileShader(const std::filesystem::path &file_path, const D3D_SHADER_M
 #endif
 
     ComPtr<ID3DBlob> error;
-    auto result = D3DCompileFromFile(file_path.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypoint.c_str(),
-                                     target.c_str(), flags, 0, code, &error);
+    auto result = D3DCompile(source.data(), source.size(), nullptr, defines,
+                             D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypoint.c_str(), target.c_str(), flags, 0,
+                             code, &error);
     if (error) {
         OutputDebugStringA(static_cast<char *>(error->GetBufferPointer()));
     }

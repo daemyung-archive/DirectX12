@@ -6,6 +6,7 @@
 add_library(common
     STATIC include/common/utility.h
            include/common/window.h
+           include/common/file_system.h
            include/common/example.h
            include/common/resource_uploader.h
            include/common/timer.h
@@ -14,6 +15,7 @@ add_library(common
            include/common/compiler.h
                src/utility.cpp
                src/window.cpp
+               src/file_system.cpp
                src/example.cpp
                src/resource_uploader.cpp
                src/timer.cpp
@@ -31,7 +33,8 @@ target_compile_features(common
 target_compile_definitions(common
     PUBLIC NOMINMAX
            UNICODE
-           WIN32_LEAN_AND_MEAN)
+           WIN32_LEAN_AND_MEAN
+           COMMON_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/asset")
 
 target_link_libraries(common
     PUBLIC external

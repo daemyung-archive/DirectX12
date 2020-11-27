@@ -59,22 +59,11 @@ const std::vector<D3D12_COMPARISON_FUNC> kDepthFunctions = {D3D12_COMPARISON_FUN
 
 //----------------------------------------------------------------------------------------------------------------------
 
-inline auto BuildFilePath(const std::string &file_name) {
-    std::filesystem::path file_path;
-
-    file_path = fmt::format("{}/{}", DEPTH_TEST_ASSET_DIR, file_name);
-    if (file_path.has_filename()) {
-        return file_path;
-    }
-
-    throw std::runtime_error(fmt::format("File isn't exist: {}.", file_name));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class DepthTest : public Example {
 public:
     DepthTest() : Example("Depth test", kDescriptorCount) {
+        FileSystem::GetInstance()->AddDirectory(DEPTH_TEST_ASSET_DIR);
+
         InitResources();
         InitPipelines();
     }
@@ -262,13 +251,11 @@ private:
 
         // Compile a vertex shader.
         ComPtr<IDxcBlob> vertex_shader;
-        ThrowIfFailed(_compiler.CompileShader(BuildFilePath("pass_through.hlsl"), L"VSMain", L"vs_6_0",
-                                              &vertex_shader));
+        ThrowIfFailed(_compiler.CompileShader("pass_through.hlsl", L"VSMain", L"vs_6_0", &vertex_shader));
 
         // Compile a pixel shader.
         ComPtr<IDxcBlob> pixel_shader;
-        ThrowIfFailed(_compiler.CompileShader(BuildFilePath("pass_through.hlsl"), L"PSMain", L"ps_6_0",
-                                              &pixel_shader));
+        ThrowIfFailed(_compiler.CompileShader("pass_through.hlsl", L"PSMain", L"ps_6_0", &pixel_shader));
 
         // Define a depth stencil state.
         D3D12_DEPTH_STENCIL_DESC depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);

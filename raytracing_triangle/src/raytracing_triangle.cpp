@@ -55,22 +55,11 @@ auto kClosestHit = L"ClosestHit";
 
 //----------------------------------------------------------------------------------------------------------------------
 
-inline auto BuildFilePath(const std::string &file_name) {
-    std::filesystem::path file_path;
-
-    file_path = fmt::format("{}/{}", RAYTRACING_TRIANGLE_ASSET_DIR, file_name);
-    if (file_path.has_filename()) {
-        return file_path;
-    }
-
-    throw std::runtime_error(fmt::format("File isn't exist: {}.", file_name));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class RaytracingTriangle : public Example {
 public:
     RaytracingTriangle() : Example("Raytracing triangle", kDescriptorCount) {
+        FileSystem::GetInstance()->AddDirectory(RAYTRACING_TRIANGLE_ASSET_DIR);
+
         CheckRaytracingSupport();
         InitResources();
         InitPipelines();
@@ -468,7 +457,7 @@ private:
 
         // Compile a library.
         ComPtr<IDxcBlob> library;
-        _compiler.CompileLibrary(BuildFilePath("raytracing.hlsl"), &library);
+        _compiler.CompileLibrary("raytracing.hlsl", &library);
 
         // Define exports.
         std::array<D3D12_EXPORT_DESC, 3> exports = {};

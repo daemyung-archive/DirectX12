@@ -39,22 +39,11 @@ const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> kDescriptorCount = {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-inline auto BuildFilePath(const std::string &file_name) {
-    std::filesystem::path file_path;
-
-    file_path = fmt::format("{}/{}", TRIANGLE_ASSET_DIR, file_name);
-    if (file_path.has_filename()) {
-        return file_path;
-    }
-
-    throw std::runtime_error(fmt::format("File isn't exist: {}.", file_name));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 class Triangle : public Example {
 public:
     Triangle() : Example("Triangle", kDescriptorCount) {
+        FileSystem::GetInstance()->AddDirectory(TRIANGLE_ASSET_DIR);
+
         InitResources();
         InitPipelines();
     }
@@ -97,8 +86,6 @@ protected:
 
     void OnRender(UINT index) override {
         FLOAT clear_color[4] = {};
-        D3D12_VIEWPORT viewport = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-        D3D12_RECT scissor_rect = {};
         D3D12_RESOURCE_BARRIER resource_barrier = {};
 
         // Define a transition of a resource from PRESENT to RENDER_TARGET.
@@ -208,13 +195,11 @@ private:
 
         // Compile a vertex shader.
         ComPtr<IDxcBlob> vertex_shader;
-        ThrowIfFailed(_compiler.CompileShader(BuildFilePath("pass_through.hlsl"), L"VSMain", L"vs_6_0",
-                                              &vertex_shader));
+        ThrowIfFailed(_compiler.CompileShader("pass_through.hlsl", L"VSMain", L"vs_6_0", &vertex_shader));
 
         // Compile a pixel shader.
         ComPtr<IDxcBlob> pixel_shader;
-        ThrowIfFailed(_compiler.CompileShader(BuildFilePath("pass_through.hlsl"), L"PSMain", L"ps_6_0",
-                                              &pixel_shader));
+        ThrowIfFailed(_compiler.CompileShader("pass_through.hlsl", L"PSMain", L"ps_6_0", &pixel_shader));
 
         // Define a graphics pipeline state.
         D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};

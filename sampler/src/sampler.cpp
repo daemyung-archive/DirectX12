@@ -44,19 +44,6 @@ struct Options {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-inline auto BuildFilePath(const std::string &file_name) {
-    std::filesystem::path file_path;
-
-    file_path = fmt::format("{}/{}", SAMPLER_ASSET_DIR, file_name);
-    if (file_path.has_filename()) {
-        return file_path;
-    }
-
-    throw std::runtime_error(fmt::format("File isn't exist: {}.", file_name));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 const std::unordered_map<D3D12_DESCRIPTOR_HEAP_TYPE, UINT> kDescriptorCount = {
         {D3D12_DESCRIPTOR_HEAP_TYPE_RTV,         kSwapChainBufferCount},
         {D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kImGuiFontBufferCount + 1},
@@ -131,6 +118,8 @@ const std::vector<D3D12_TEXTURE_ADDRESS_MODE> kTextureAddressModes = {D3D12_TEXT
 class Sampler : public Example {
 public:
     Sampler() : Example("Sampler", kDescriptorCount) {
+        FileSystem::GetInstance()->AddDirectory(SAMPLER_ASSET_DIR);
+
         InitResources();
         InitSampler();
         InitPipelines();
@@ -284,7 +273,7 @@ private:
 
         // Read an image.
         ImageLoader image_loader;
-        auto image = image_loader.LoadFile(BuildFilePath("uv_test_pattern.dds"));
+        auto image = image_loader.LoadFile("uv_test_pattern.dds");
 
         // Initialize a texture.
         ThrowIfFailed(CreateDefaultTexture2D(_device.Get(), image.width, image.height,
@@ -358,11 +347,11 @@ private:
 
         // Compile a vertex shader.
         ComPtr<ID3DBlob> vertex_shader;
-        ThrowIfFailed(CompileShader(BuildFilePath("unlit.hlsl"), "VSMain", "vs_5_0", &vertex_shader));
+        ThrowIfFailed(CompileShader("unlit.hlsl", "VSMain", "vs_5_0", &vertex_shader));
 
         // Compile a pixel shader.
         ComPtr<ID3DBlob> pixel_shader;
-        ThrowIfFailed(CompileShader(BuildFilePath("unlit.hlsl"), "PSMain", "ps_5_0", &pixel_shader));
+        ThrowIfFailed(CompileShader("unlit.hlsl", "PSMain", "ps_5_0", &pixel_shader));
 
         // Define a graphics pipeline state.
         D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};

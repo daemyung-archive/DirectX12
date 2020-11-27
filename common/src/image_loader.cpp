@@ -8,11 +8,12 @@
 
 #include "image_loader.h"
 
+#include <fmt/format.h>
 #include <d3dx12.h>
 #include <dds-ktx.h>
 #include <stb_image.h>
 
-#include "utility.h"
+#include "file_system.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +42,7 @@ Image LoadDDSKTX(const std::filesystem::path &path) {
     Image image;
 
     // Read pixels from a file.
-    image.contents = ReadFile(path);
+    image.contents = FileSystem::GetInstance()->ReadFile(path);
     auto size = static_cast<INT>(image.contents.size());
 
     // Read texture information.

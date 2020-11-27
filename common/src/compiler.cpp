@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "utility.h"
+#include "file_system.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ Compiler::Compiler() {
 
 HRESULT Compiler::CompileShader(const std::filesystem::path &path, const std::wstring &entrypoint,
                                 const std::wstring &target, IDxcBlob** code) {
-    auto source = ReadFile(path);
+    auto source = FileSystem::GetInstance()->ReadFile(path);
 
     // Create encoded source from the string.
     ComPtr<IDxcBlobEncoding> encoded_source;

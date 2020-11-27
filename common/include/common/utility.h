@@ -84,13 +84,6 @@ extern std::wstring ConvertUTF8ToUTF16(const char* utf8);
 
 //----------------------------------------------------------------------------------------------------------------------
 
-//! Read a file.
-//! \param path The file path.
-//! \return A contents of file.
-extern std::vector<BYTE> ReadFile(const std::filesystem::path &path);
-
-//----------------------------------------------------------------------------------------------------------------------
-
 //! Throw an exception if a function returns an error.
 //! \param function A function call.
 #define ThrowIfFailed(function) {                                                              \
